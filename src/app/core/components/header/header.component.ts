@@ -1,5 +1,4 @@
 import { Component, EventEmitter, Output } from '@angular/core';
-import { YouTubeService } from 'src/app/youTube/services/youTube.service';
 import { Router } from '@angular/router';
 
 interface EmitterValue {
@@ -15,6 +14,6 @@ interface EmitterValue {
 export class HeaderComponent {
   @Output() searchEmitter = new EventEmitter<boolean>();
 
-  constructor(private youTubeService: YouTubeService, private router: Router) {}
+  constructor(private router: Router) {}
 
 }

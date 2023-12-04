@@ -6,13 +6,10 @@ import { AppRoutingModule } from './app-routing.module';
 import CoreModule from './core/modules/core.module';
 import { HashLocationStrategy, LocationStrategy } from '@angular/common';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
-import { ShortUrlInterceptor } from './youTube/services/httpInterceptor';
+import { ShortUrlInterceptor } from './connections/services/httpInterceptor';
 import { StoreModule } from '@ngrx/store';
-import { customVideoReducer } from './redux/reducers/videoList.reducer';
+import { userInfoReducer } from './redux/reducers/userInfo.reducer';
 import { EffectsModule } from '@ngrx/effects';
-import { YouTubeEffects } from './redux/effects/youTube.effect';
-import { youTubeReducer } from './redux/reducers/youTube.reducer';
-import { DetailsEffects } from './redux/effects/details.effect';
 import { ToastrModule } from 'ngx-toastr';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
@@ -25,14 +22,17 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     AppRoutingModule,
     HttpClientModule,
     ToastrModule.forRoot(),
-    StoreModule.forRoot({customVideos: customVideoReducer, youTubeVideos: youTubeReducer}, {}),
-    EffectsModule.forRoot([YouTubeEffects, DetailsEffects])
+    StoreModule.forRoot({ userInfo: userInfoReducer }, {}),
+    EffectsModule.forRoot(),
   ],
-  providers: [{provide: LocationStrategy, useClass: HashLocationStrategy}, {
-    provide: HTTP_INTERCEPTORS,
-    useClass: ShortUrlInterceptor,
-    multi: true
-  }],
+  providers: [
+    { provide: LocationStrategy, useClass: HashLocationStrategy },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: ShortUrlInterceptor,
+      multi: true,
+    },
+  ],
   bootstrap: [AppComponent],
 })
 export default class AppModule {}

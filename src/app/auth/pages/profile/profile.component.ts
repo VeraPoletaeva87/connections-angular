@@ -10,7 +10,7 @@ import { State } from '../../../redux/state.models';
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.css'],
 })
-export class DetailsComponent {
+export class ProfileComponent {
   item!: UserData;
 
   constructor(
@@ -41,6 +41,7 @@ export class DetailsComponent {
         response.clone().json()
           .then((data) => {
             this.item = data;
+            this.item.createdAt.S = new Date(+data.createdAt.S).toDateString()
           });
     }
 });

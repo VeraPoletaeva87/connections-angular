@@ -14,7 +14,6 @@ export class RegisterPageComponent {
   constructor(
     private loginService: LoginService, 
     private router: Router,
-    
     private formBuilder: NonNullableFormBuilder
   ) {}
 

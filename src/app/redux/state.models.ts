@@ -1,23 +1,22 @@
-import { WholeDataCustom } from "../shared/types";
+import { UserData } from "../shared/types";
 
 export interface State {
-    customVideos: {
-      videoList: WholeDataCustom[];
-    },
-    youTubeVideos: {
-      videoList: WholeDataCustom[];
-      loading: boolean,
-      error: boolean
-    }
+      userInfo: UserData
     }
   
   export const initialState: State = {
-    customVideos: {
-      videoList: [],
-    },
-    youTubeVideos: {
-      videoList: [],
-      loading: false,
-      error: false
+    userInfo: {
+      uid: {
+        S: ''
+      },
+      name: {
+        S: ''
+      },
+      email: {
+        S: ''
+      },
+      createdAt: {
+        S: ''
+      }
     }
   };

@@ -1,13 +1,10 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { DetailsComponent } from './youTube/pages/details/details.component';
 import { PageNotFoundComponent } from './core/pages/page-not-found/page-not-found.component';
-import { CreateCardComponent } from './youTube/pages/cardCreationForm/card.component';
-import { FavoriteComponent } from './youTube/pages/favorites/favorites.component';
 import { LoginPageComponent } from './auth/pages/signin-page/form.component';
+import { ProfileComponent } from './auth/pages/profile/profile.component';
 
 const routes: Routes = [
-  { path: 'details/:id', component: DetailsComponent },
   { path: '', redirectTo: '/signup', pathMatch: 'full' },
   {
     path: 'signup',
@@ -15,18 +12,13 @@ const routes: Routes = [
       import('./auth/modules/auth.module').then((m) => m.AuthModule),
   },
   { path: 'signin', component: LoginPageComponent },
+  { path: 'profile', component: ProfileComponent },
   {
     path: 'main',
     loadChildren: () =>
-      import('./youTube/modules/youTube.module').then((m) => m.YouTubeModule),
-  },
-  {
-    path: 'create-card',
-    component: CreateCardComponent,
-  },
-  {
-    path: 'favorites',
-    component: FavoriteComponent,
+      import('./connections/modules/connections.module').then(
+        (m) => m.YouTubeModule
+      ),
   },
   { path: '**', component: PageNotFoundComponent },
 ];
