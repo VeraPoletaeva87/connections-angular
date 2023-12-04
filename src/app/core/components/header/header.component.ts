@@ -14,30 +14,7 @@ interface EmitterValue {
 })
 export class HeaderComponent {
   @Output() searchEmitter = new EventEmitter<boolean>();
-  @Output() sortEmitter = new EventEmitter<EmitterValue>();
-  @Output() textEmitter = new EventEmitter<string>();
-
-  showSettings: boolean = false;
 
   constructor(private youTubeService: YouTubeService, private router: Router) {}
 
-  handleSearch(searchQuery: string) {
-    this.youTubeService.setSearchQuery(searchQuery);
-  }
-
-  handleEventFromSettings() {
-    this.showSettings = !this.showSettings;
-  }
-
-  handleEventFromSort(value: {value: string, direction: boolean}) {
-    this.youTubeService.setSortParams(value.value, value.direction);
-  }
-
-  showFavoritesHandler() {
-    this.router.navigate(['/favorites']);
-  }
-
-  cardCreateHandler() {
-    this.router.navigate(['/create-card']);
-  }
 }

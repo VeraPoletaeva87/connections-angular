@@ -4,6 +4,7 @@ import { DetailsComponent } from './youTube/pages/details/details.component';
 import { PageNotFoundComponent } from './core/pages/page-not-found/page-not-found.component';
 import { CreateCardComponent } from './youTube/pages/cardCreationForm/card.component';
 import { FavoriteComponent } from './youTube/pages/favorites/favorites.component';
+import { LoginPageComponent } from './auth/pages/signin-page/form.component';
 
 const routes: Routes = [
   { path: 'details/:id', component: DetailsComponent },
@@ -13,6 +14,7 @@ const routes: Routes = [
     loadChildren: () =>
       import('./auth/modules/auth.module').then((m) => m.AuthModule),
   },
+  { path: 'signin', component: LoginPageComponent },
   {
     path: 'main',
     loadChildren: () =>

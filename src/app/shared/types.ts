@@ -94,3 +94,18 @@ export interface StatisticsData {
     favorite: boolean,
     custom: boolean
   }
+
+  export interface UserData {
+    uid: {
+      S: string
+    },
+    name: {
+      S: string
+    },
+    email: {
+      S: string
+    },
+    createdAt: {
+      S: string
+    }
+  }

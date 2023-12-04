@@ -13,15 +13,14 @@ import * as CustomVideoActions from '../../../redux/actions/videoList.actions';
   templateUrl: './details.component.html',
   styleUrls: ['./details.component.css'],
 })
-export class DetailsComponent { 
+export class DetailsComponent {
   id: string = '';
   item!: WholeDataCustom;
 
   isFavorite: boolean = false;
   favoriteIconSrc: string = 'assets/images/favorite.png';
-  public subscription: Subscription = new Subscription;
-  public detailsSubscription: Subscription = new Subscription;
-  
+  public subscription: Subscription = new Subscription();
+  public detailsSubscription: Subscription = new Subscription();
 
   constructor(
     private store: Store<State>,
@@ -30,18 +29,23 @@ export class DetailsComponent {
   ) {}
 
   ngOnInit() {
-    const item$ = this.route.paramMap.pipe(
-      switchMap((params) => {
-        const id = params.get('id') || '';
-        return this.store.select(getDetails(id)).pipe(
-          tap((item) => {
-            if (item) {
-              this.item = item;
-              this.favoriteIconSrc = this.item.favorite ? 'assets/images/likesIcon.png' : 'assets/images/favorite.png';
-            }
-          })
-        )
-      })).subscribe();
+    const item$ = this.route.paramMap
+      .pipe(
+        switchMap((params) => {
+          const id = params.get('id') || '';
+          return this.store.select(getDetails(id)).pipe(
+            tap((item) => {
+              if (item) {
+                this.item = item;
+                this.favoriteIconSrc = this.item.favorite
+                  ? 'assets/images/likesIcon.png'
+                  : 'assets/images/favorite.png';
+              }
+            })
+          );
+        })
+      )
+      .subscribe();
   }
 
   ngOnDestroy() {
@@ -51,18 +55,21 @@ export class DetailsComponent {
 
   favoriteHandler() {
     this.isFavorite = !this.isFavorite;
-    this.item = {...this.item, favorite: this.isFavorite};
-    this.store.dispatch(YouTubeActions.AddToFavorites({item: this.item}));
-    this.favoriteIconSrc = this.item.favorite ? 'assets/images/likesIcon.png' : 'assets/images/favorite.png';
+    this.item = { ...this.item, favorite: this.isFavorite };
+    this.store.dispatch(YouTubeActions.AddToFavorites({ item: this.item }));
+    this.favoriteIconSrc = this.item.favorite
+      ? 'assets/images/likesIcon.png'
+      : 'assets/images/favorite.png';
   }
 
   cardDeleteHandler() {
-    this.store.dispatch(CustomVideoActions.DeleteCustomVideo({id: this.item.id || ''}));
+    this.store.dispatch(
+      CustomVideoActions.DeleteCustomVideo({ id: this.item.id || '' })
+    );
     this.router.navigate(['/main']);
   }
 
   backClickHandler() {
     this.router.navigate(['/main']);
   }
-
 }

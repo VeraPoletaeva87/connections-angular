@@ -5,3 +5,7 @@
     color: white;
     background-color: #0078b3;
 }
+
+.button:disabled {
+    background-color: #787f83;
+}

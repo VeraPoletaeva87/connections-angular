@@ -4,17 +4,21 @@ import { AbstractControl, FormControl, NonNullableFormBuilder, Validators } from
 import { LoginService } from '../../services/login.service';
 import { passwordStrengthValidator, firstNameValidator } from '../../services/validators';
 
+
 @Component({
-  selector: 'app-login-page',
-  templateUrl: './login-page.component.html',
-  styleUrls: ['./login-page.component.css'],
+  selector: 'app-register-page',
+  templateUrl: './form.component.html',
+  styleUrls: ['./form.component.css'],
 })
-export class LoginPageComponent {
+export class RegisterPageComponent {
   constructor(
     private loginService: LoginService, 
     private router: Router,
+    
     private formBuilder: NonNullableFormBuilder
   ) {}
+
+  submitDisabled = false;
 
   loginForm = this.formBuilder.group({
     name: new FormControl('',  [Validators.required, Validators.maxLength(40), firstNameValidator()]),
@@ -26,6 +30,12 @@ export class LoginPageComponent {
   get login(): AbstractControl<string | null> | null { return this.loginForm.get('login'); }
   get password(): AbstractControl<string | null> | null { return this.loginForm.get('password'); }
 
+
+
+  inputChangeHandler() {
+    this.submitDisabled = this.loginForm.invalid;
+  }
+
   loginHandler() {
     if (!this.loginForm.invalid) {
      const formData = {
@@ -33,8 +43,8 @@ export class LoginPageComponent {
       name: this.loginForm.controls.name.value,
       password: this.loginForm.controls.password.value
      }
-     const urlBase = `https://tasks.app.rs.school/angular/registration`;
-     fetch(urlBase, 
+     this.submitDisabled = true;
+     fetch('https://tasks.app.rs.school/angular/registration', 
       {
         headers: {
           'Accept': 'application/json',
@@ -42,16 +52,21 @@ export class LoginPageComponent {
         },
         method: "POST",
         body: JSON.stringify(formData)
-    }).then(function (response) {
-      return response.json();
-  })
-  .then(function (result) {
-      alert(result);
-  })
-  .catch (function (error) {
-      console.log('Request failed', error);
+    }).then(response => {
+      if (!response.ok) {
+         response.json()
+              .catch(() => {
+                  throw new Error('Could not parse the JSON');
+              })
+              .then(({message}) => {
+                this.loginService.openError(message);
+              });
+      } else {
+        this.loginService.openSuccess('User is successfuly registered!');
+        this.submitDisabled = false;
+        this.router.navigate(['/signin']);
+      }
   });
-      //this.router.navigate(['/main']);
     } else {
       this.loginForm.markAllAsTouched();
     }

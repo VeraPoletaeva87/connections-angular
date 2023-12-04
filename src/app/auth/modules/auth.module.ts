@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 
-import { LoginPageComponent } from '../pages/login-page/login-page.component';
+import { RegisterPageComponent } from '../pages/registration/form.component';
+import { LoginPageComponent } from '../pages/signin-page/form.component';
 import SharedModule from '../../shared/modules/shared.module';
 import { Routes } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -8,11 +9,17 @@ import { AuthRoutingModule } from './auth-routing.module';
 import { ReactiveFormsModule } from '@angular/forms';
 import { LoginBlockComponent } from '../components/loginBlock/loginBlock.component';
 
-const loginRoutes: Routes = [{ path: '', component: LoginPageComponent }];
+const loginRoutes: Routes = [{ path: '', component: RegisterPageComponent }];
 
 @NgModule({
-  declarations: [LoginPageComponent],
-  imports: [CommonModule, ReactiveFormsModule, SharedModule, AuthRoutingModule, LoginBlockComponent],
+  declarations: [RegisterPageComponent, LoginPageComponent],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    SharedModule,
+    AuthRoutingModule,
+    LoginBlockComponent,
+  ],
   exports: [],
 })
 export class AuthModule {}

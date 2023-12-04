@@ -13,14 +13,18 @@ import { EffectsModule } from '@ngrx/effects';
 import { YouTubeEffects } from './redux/effects/youTube.effect';
 import { youTubeReducer } from './redux/reducers/youTube.reducer';
 import { DetailsEffects } from './redux/effects/details.effect';
+import { ToastrModule } from 'ngx-toastr';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   declarations: [AppComponent, SearchPipe],
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     CoreModule,
     AppRoutingModule,
     HttpClientModule,
+    ToastrModule.forRoot(),
     StoreModule.forRoot({customVideos: customVideoReducer, youTubeVideos: youTubeReducer}, {}),
     EffectsModule.forRoot([YouTubeEffects, DetailsEffects])
   ],

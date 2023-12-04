@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { ToastrService } from 'ngx-toastr';
 
 @Injectable({ providedIn: 'root' })
 
@@ -9,20 +10,38 @@ export class LoginService {
     loggedIn: boolean = false;
     private valueObs: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
-    constructor(private router: Router) {}
+    constructor(private router: Router, private toast: ToastrService,) {}
+
+    openSuccess(message: string) {
+        this.toast.success(message);
+      }
+    
+    openError(error: string) {
+        this.toast.error(error);
+      }
 
     setValue(value: boolean): void {
         this.valueObs.next(value);
       }
       
-      getValue(): Observable<boolean> {
+    getValue(): Observable<boolean> {
         return this.valueObs.asObservable();
-      }
+    }
 
-    saveUser(login: string, password: string) {
-        localStorage.setItem('login', login);
-        localStorage.setItem('password', password);
+    saveUser(email: string, token: string, uid: string) {
+        localStorage.setItem('email', email);
+        localStorage.setItem('token', token);
+        localStorage.setItem('uid', uid);
         this.setValue(true);
+    }
+
+    getUser() {
+        this.setValue(true);
+        return {
+            email: localStorage.getItem('email'),
+            token: localStorage.getItem('token'),
+            uid: localStorage.getItem('uid')
+        };
     }
 
     logOut() {
