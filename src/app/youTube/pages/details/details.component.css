@@ -1,0 +1,71 @@
+.image {
+  width: 640px;
+  height: 480px;
+}
+
+.flex {
+    display: flex;
+}
+
+.back-button {
+    height: 30px;
+}
+
+.details-block {
+    width: 70%;
+    margin-left: 300px;
+    margin-top: 30px;
+}
+
+.shadow {
+    box-shadow: 8px 8px 8px rgb(169 160 160);
+}
+
+.info-block {
+    background-color: #e5e1e1;
+    padding: 30px;
+}
+
+.title {
+    font-size: 25px;
+    font-weight: bold;
+    font-family: system-ui;
+    max-width: 395px;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.small {
+    font-size: 13px;
+    color: rgb(100 92 92);
+}
+
+.description {
+    margin-top: 36px;
+    margin-bottom: 8px;
+}
+
+.statistics {
+    position: absolute;
+    top: 640px;
+    right: 455px;
+}
+
+.margin-medium {
+    margin-left: 12px;
+}
+
+.margin-small {
+    margin-left: 4px;
+}
+
+.font-small {
+    font-size: 13px;
+}
+
+.spread {
+    display: flex;
+    justify-content: space-between;
+}

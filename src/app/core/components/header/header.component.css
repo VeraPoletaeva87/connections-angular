@@ -1,0 +1,41 @@
+.header-block {
+    background-color: #e5e1e1;
+    height: 60px;
+    display: flex;
+    flex-direction: column;
+    padding-top: 30px;
+    align-items: center;
+}
+
+.flex-row {
+    display: flex;
+}
+
+.margin {
+    margin-left: 12px;
+    padding-top: 4px;
+}
+
+.login-position {
+    position: relative;
+    left: 420px;
+}
+
+.logout-position {
+    position: relative;
+    left: 500px;
+}
+
+.create-position {
+    position: relative;
+    left: 360px;
+}
+
+.margin-top {
+    margin-top: 40px;
+}
+
+.sort-position {
+    position: relative;
+    right: 34px;
+}

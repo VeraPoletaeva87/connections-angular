@@ -1,0 +1,12 @@
+.border-round {
+    border-radius: 4px;
+}
+
+.margin-small {
+    margin-left: 12px;
+}
+
+.bottom {
+    position: relative;
+    bottom: 8px;
+}

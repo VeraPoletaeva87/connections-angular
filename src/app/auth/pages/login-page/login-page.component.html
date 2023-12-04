@@ -1,0 +1,51 @@
+<div class="login-block">
+    <div class="bold-text">Login</div>
+    <form [formGroup]="loginForm" (ngSubmit)="loginHandler()">
+        <label class="small-text" for="name">first name </label>
+        <input  class="input {{name?.invalid && (name?.dirty || name?.touched) ? 'red-border' : ''}}"
+            type="text"
+            formControlName="name"
+            maxlength
+            required/>
+        <div *ngIf="name?.invalid && (name?.dirty || name?.touched)" class="invalid">
+             <div *ngIf="name?.errors?.['required']">
+                Please enter a first name
+             </div>
+             <div *ngIf="name?.errors?.['maxlength']">
+                The first name is too long
+             </div>
+             <div class="invalid" *ngIf="name?.errors?.['firstName']">
+                {{name?.errors?.['firstName']}}
+            </div>
+        </div>
+        <label class="small-text" for="login">login </label>
+        <input  class="input {{login?.invalid && (login?.dirty || login?.touched) ? 'red-border' : ''}}"
+            type="text"
+            formControlName="login"
+            required
+            email/>
+        <div *ngIf="login?.invalid && (login?.dirty || login?.touched)" class="invalid">
+             <div *ngIf="login?.errors?.['required']">
+                Please enter a email
+             </div>
+             <div *ngIf="login?.errors?.['email']">
+                The email is invalid
+             </div>
+        </div>
+        <label class="small-text" for="password">password </label>
+        <input  class="input {{password?.invalid && (password?.dirty || password?.touched) ? 'red-border' : ''}}"
+            type="password"
+            name="password"
+            required
+            formControlName="password"/>  
+            <div *ngIf="password?.invalid && (password?.dirty || password?.touched)" class="invalid">
+         <div *ngIf="password?.errors?.['required']">
+                Please enter a password
+         </div>
+         <div class="invalid" *ngIf="password?.errors?.['passwordStrength']">
+            Your password isn't strong enough. {{password?.errors?.['passwordStrength']}}
+        </div>
+        </div>     
+        <app-button class="login-button">Login</app-button>         
+    </form>      
+</div>

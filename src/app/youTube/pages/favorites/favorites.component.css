@@ -1,0 +1,13 @@
+.flex {
+    display: flex;
+    justify-content: center;
+    width: 70%;
+    margin-left: 14.5%;
+    margin-top: 30px;
+    background-color: rgb(236, 234, 231);
+}
+
+.button-position {
+    position: absolute;
+    left: 244px;
+}
