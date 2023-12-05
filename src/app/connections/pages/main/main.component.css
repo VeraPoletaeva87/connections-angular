@@ -1,0 +1,11 @@
+.grid-container {
+    display: grid;
+    grid-template-columns: auto auto auto auto;
+    padding-top: 10px;
+    padding-left: 300px;
+    width: 70%;
+}
+
+.grid-item {
+    padding: 20px;
+  }

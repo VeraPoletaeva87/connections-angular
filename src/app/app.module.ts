@@ -1,12 +1,10 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import AppComponent from './app.component';
-import { SearchPipe } from './shared/pipes/search.pipe';
 import { AppRoutingModule } from './app-routing.module';
 import CoreModule from './core/modules/core.module';
 import { HashLocationStrategy, LocationStrategy } from '@angular/common';
-import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
-import { ShortUrlInterceptor } from './connections/services/httpInterceptor';
+import { HttpClientModule } from '@angular/common/http';
 import { StoreModule } from '@ngrx/store';
 import { userInfoReducer } from './redux/reducers/userInfo.reducer';
 import { EffectsModule } from '@ngrx/effects';
@@ -14,7 +12,7 @@ import { ToastrModule } from 'ngx-toastr';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
-  declarations: [AppComponent, SearchPipe],
+  declarations: [AppComponent],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
@@ -26,12 +24,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     EffectsModule.forRoot(),
   ],
   providers: [
-    { provide: LocationStrategy, useClass: HashLocationStrategy },
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: ShortUrlInterceptor,
-      multi: true,
-    },
+    { provide: LocationStrategy, useClass: HashLocationStrategy }
   ],
   bootstrap: [AppComponent],
 })

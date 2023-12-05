@@ -1,9 +1,12 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { UserData } from '../../../shared/types';
-import { Store } from '@ngrx/store';
+import { Store, select } from '@ngrx/store';
 import { LoginService } from '../../services/login.service';
 import { State } from '../../../redux/state.models';
+import * as UserActions from '../../../redux/actions/userInfo.actions';
+import { getUserInfo, selectUserState } from '../../../redux/selectors/userInfo.selector';
+import { tap } from 'rxjs';
 
 @Component({
   selector: 'app-profile',
@@ -19,7 +22,7 @@ export class ProfileComponent {
     private loginService: LoginService
   ) {}
 
-  ngOnInit() {
+  requestProfile = () => {
     const params = this.loginService.getUser();
     fetch('https://tasks.app.rs.school/angular/profile', {
         headers: {
@@ -41,10 +44,24 @@ export class ProfileComponent {
         response.clone().json()
           .then((data) => {
             this.item = data;
-            this.item.createdAt.S = new Date(+data.createdAt.S).toDateString()
+            this.item.createdAt.S = new Date(+data.createdAt.S).toDateString();
+            this.store.dispatch(UserActions.AddUserInfo({item: this.item}));
           });
     }
 });
   }
+
+  ngOnInit() {
+   return this.store
+  .pipe(
+    select((state) => getUserInfo(state))
+    ).subscribe((item: UserData) => {
+        if (item.uid.S !== '') {
+            this.item = item;
+          } else {
+            this.requestProfile();
+          }
+    }) 
+ }
 
 }
