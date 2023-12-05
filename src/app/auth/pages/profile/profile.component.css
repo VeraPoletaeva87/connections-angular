@@ -34,3 +34,15 @@
  font-family: system-ui;
  color: rgb(17, 25, 100);
 }
+
+.margin-top {
+    margin-top: 40px;
+}
+
+.margin-right {
+    margin-right: 12px;
+}
+
+.margin-rightXS {
+    margin-right: 6px;
+}

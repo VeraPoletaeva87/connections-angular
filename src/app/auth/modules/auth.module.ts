@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 
 import { RegisterPageComponent } from '../pages/registration/form.component';
+import { ProfileComponent } from '../pages/profile/profile.component';
 import { LoginPageComponent } from '../pages/signin-page/form.component';
 import SharedModule from '../../shared/modules/shared.module';
 import { Routes } from '@angular/router';
@@ -12,7 +13,7 @@ import { LoginBlockComponent } from '../components/loginBlock/loginBlock.compone
 const loginRoutes: Routes = [{ path: '', component: RegisterPageComponent }];
 
 @NgModule({
-  declarations: [RegisterPageComponent, LoginPageComponent],
+  declarations: [RegisterPageComponent, LoginPageComponent, ProfileComponent],
   imports: [
     CommonModule,
     ReactiveFormsModule,

@@ -5,8 +5,7 @@ import { Store, select } from '@ngrx/store';
 import { LoginService } from '../../services/login.service';
 import { State } from '../../../redux/state.models';
 import * as UserActions from '../../../redux/actions/userInfo.actions';
-import { getUserInfo, selectUserState } from '../../../redux/selectors/userInfo.selector';
-import { tap } from 'rxjs';
+import { getUserInfo } from '../../../redux/selectors/userInfo.selector';
 
 @Component({
   selector: 'app-profile',
@@ -15,12 +14,71 @@ import { tap } from 'rxjs';
 })
 export class ProfileComponent {
   item!: UserData;
+  isEditing: boolean = false;
+  newName: string = '';
 
   constructor(
     private store: Store<State>,
     private router: Router,
     private loginService: LoginService
   ) {}
+
+  editHandler() {
+    this.isEditing = true;
+  }
+
+  cancelHandler() {
+    this.isEditing = false;
+  }
+
+  inputChangeHandler(e: Event) {
+    this.newName = (e.target as HTMLInputElement).value;
+  }
+
+
+  getHeaders() {
+    const params = this.loginService.getUser();
+    return {
+        'rs-uid': params.uid || '',
+        'rs-email': params.email || '',
+        'Authorization': 'Bearer '+params.token
+    };
+  }
+
+  saveHandler() {
+    const params = this.loginService.getUser();
+    this.isEditing = false;
+    const formData = {
+        name: this.newName
+    };
+
+    fetch('https://tasks.app.rs.school/angular/profile', 
+    {
+      headers: {
+        'rs-uid': params.uid || '',
+        'rs-email': params.email || '',
+        'Authorization': 'Bearer '+params.token,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      method: "PUT",
+      body: JSON.stringify(formData)
+  }).then(response => {
+    if (!response.ok) {
+       response.json()
+            .catch(() => {
+                throw new Error('Could not parse the JSON');
+            })
+            .then(({message}) => {
+              this.loginService.openError(message);
+            });
+    } else {
+        this.item = {uid: this.item.uid, name: {S : this.newName}, email: this.item.email, createdAt: this.item.createdAt} ;
+        this.store.dispatch(UserActions.AddUserInfo({item: this.item}));
+        this.loginService.openSuccess('User name successfuly changed!');
+    }
+});
+  }
 
   requestProfile = () => {
     const params = this.loginService.getUser();
