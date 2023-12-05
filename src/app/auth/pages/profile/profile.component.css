@@ -1,0 +1,36 @@
+.flex {
+    display: flex;
+}
+
+.profile-block {
+  width: 22%;
+  margin-left: 35%;
+  margin-top: 30px;
+  border-radius: 6px;
+  background-color: #dde6f1;
+  padding: 16px;
+}
+
+.shadow {
+ box-shadow: 8px 8px 8px rgb(169 160 160);
+}
+
+
+.user-id {
+  font-size: 20px;
+  font-weight: bold;
+  font-family: system-ui;
+  max-width: 395px;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-bottom: 1px solid #9ea3bf;
+  margin-bottom: 14px;
+}
+
+.font18 {
+ font-size: 18px;
+ font-family: system-ui;
+ color: rgb(17, 25, 100);
+}
