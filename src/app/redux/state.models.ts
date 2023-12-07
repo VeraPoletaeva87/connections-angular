@@ -1,7 +1,8 @@
-import { UserData } from "../shared/types";
+import { GroupInfo, UserData } from "../shared/types";
 
 export interface State {
-      userInfo: UserData
+      userInfo: UserData,
+      groupInfo: GroupInfo[]
     }
   
   export const initialState: State = {
@@ -18,5 +19,6 @@ export interface State {
       createdAt: {
         S: ''
       }
-    }
-  };
+    },
+    groupInfo: []
+  };   

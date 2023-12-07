@@ -47,14 +47,14 @@ export class LoginService {
     logOut() {
         this.setValue(false);
         localStorage.clear();
-        this.router.navigate(['/login']);
+        this.router.navigate(['/signin']);
     }
 
     isLoggedIn() {
-        return !!localStorage.getItem('login');
+        return !!localStorage.getItem('email');
     } 
 
     updateLogged() {
-        this.setValue(!!localStorage.getItem('login'));
+        this.setValue(!!localStorage.getItem('email'));
     }
 }

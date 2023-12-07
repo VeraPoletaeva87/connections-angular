@@ -6,10 +6,14 @@ import { MainComponent } from '../pages/main/main.component';
 import { CommonModule } from '@angular/common';
 import { ConnectionsRoutingModule } from './connections-routing.modules';
 import { ReactiveFormsModule } from '@angular/forms';
+import { ListComponent } from '../components/groupList/list.component';
+import { DialogComponent } from '../components/createGroup/dialog.component';
 
 @NgModule({
   declarations: [
-    MainComponent,
+    DialogComponent,
+    ListComponent,
+    MainComponent
   ],
   providers: [DatePipe],
   imports: [
@@ -19,4 +23,4 @@ import { ReactiveFormsModule } from '@angular/forms';
     ConnectionsRoutingModule,
   ],
 })
-export class YouTubeModule {}
+export class ConnectionsModule {}

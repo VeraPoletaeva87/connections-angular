@@ -9,3 +9,8 @@
 .grid-item {
     padding: 20px;
   }
+
+.flex {
+    display: flex;
+    justify-content: space-between;
+}  

@@ -17,7 +17,7 @@ const routes: Routes = [
     path: 'main',
     loadChildren: () =>
       import('./connections/modules/connections.module').then(
-        (m) => m.YouTubeModule
+        (m) => m.ConnectionsModule
       ),
   },
   { path: '**', component: PageNotFoundComponent },

@@ -3,12 +3,16 @@
 }
 
 .profile-block {
-  width: 22%;
-  margin-left: 35%;
+  width: 40%;
+  margin-left: 27%;
   margin-top: 30px;
   border-radius: 6px;
   background-color: #dde6f1;
   padding: 16px;
+}
+
+.spread {
+  justify-content: space-between;
 }
 
 .shadow {

@@ -1,0 +1,12 @@
+<div>
+    <div class="flex baseline">
+        <app-button class="marginS" (click)="updateHandler()">Update</app-button> 
+        <app-button (click)="createHandler()">Create group</app-button>
+    </div>
+    <div class="list-block">
+        <div class="list-item" *ngFor="let item of items">
+            {{ item.name.S }}
+        </div>
+    </div>
+    <app-dialog [visible]="showDialog" (closeEmitter)="handleCloseDialog()"></app-dialog> 
+</div>  

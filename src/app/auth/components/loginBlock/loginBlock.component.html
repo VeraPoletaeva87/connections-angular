@@ -1,9 +1,0 @@
-<div>
-    <span class="bottom">Your Name</span>
-    <img class="border-round margin-small"
-         alt="main.jpg" 
-         src="assets/images/loginIcon.png"
-         (click)="clickHandler()"/> 
-    <ng-container *ngIf="loggedIn"><app-button (click)=logoutClickHandler() class="logout-position">Log out</app-button></ng-container>
-    <ng-container *ngIf="!loggedIn"><app-button (click)=loginClickHandler() class="logout-position">Log in</app-button></ng-container> 
-</div>

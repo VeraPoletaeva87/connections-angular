@@ -15,6 +15,8 @@ import { getUserInfo } from '../../../redux/selectors/userInfo.selector';
 export class ProfileComponent {
   item!: UserData;
   isEditing: boolean = false;
+  isSaving: boolean = false;
+  isLoggingOut: boolean = false;
   newName: string = '';
 
   constructor(
@@ -45,9 +47,39 @@ export class ProfileComponent {
     };
   }
 
-  saveHandler() {
+  logoutHandler() {
+    this.isLoggingOut = true;
     const params = this.loginService.getUser();
-    this.isEditing = false;
+    fetch('https://tasks.app.rs.school/angular/logout', 
+    {
+      headers: {
+        'rs-uid': params.uid || '',
+        'rs-email': params.email || '',
+        'Authorization': 'Bearer '+params.token,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      method: "DELETE"
+  }).then(response => {
+    if (!response.ok) {
+       response.json()
+            .catch(() => {
+                throw new Error('Could not parse the JSON');
+            })
+            .then(({message}) => {
+              this.loginService.openError(message);
+            });
+    } else {
+        this.loginService.logOut();
+        this.loginService.openSuccess('User successfuly logged out!');
+        this.isLoggingOut = false;
+    }
+  });
+  }
+
+  saveHandler() {
+    this.isSaving = true;
+    const params = this.loginService.getUser();
     const formData = {
         name: this.newName
     };
@@ -76,9 +108,10 @@ export class ProfileComponent {
         this.item = {uid: this.item.uid, name: {S : this.newName}, email: this.item.email, createdAt: this.item.createdAt} ;
         this.store.dispatch(UserActions.AddUserInfo({item: this.item}));
         this.loginService.openSuccess('User name successfuly changed!');
+        this.isSaving = false;
     }
-});
-  }
+  });
+}
 
   requestProfile = () => {
     const params = this.loginService.getUser();
