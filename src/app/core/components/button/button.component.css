@@ -9,3 +9,7 @@
 .button:disabled {
     background-color: #787f83;
 }
+
+.button:hover {
+    cursor: pointer;
+}

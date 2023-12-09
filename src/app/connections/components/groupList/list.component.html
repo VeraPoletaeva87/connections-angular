@@ -5,8 +5,18 @@
     </div>
     <div class="list-block">
         <div class="list-item" *ngFor="let item of items">
-            {{ item.name.S }}
+            <div *ngIf="item.createdBy.S === params.uid" (click)="deleteHandler(item.id.S)" class="delete">&times;</div>
+            <div>
+                {{ item.name.S }}
+            </div>
         </div>
     </div>
-    <app-dialog [visible]="showDialog" (closeEmitter)="handleCloseDialog()"></app-dialog> 
+    <app-dialog [visible]="showDialog" 
+            (closeEmitter)="handleCloseDialog()"
+            (saveEmitter)="handleSaveGroup()">
+    </app-dialog> 
+    <app-confirmation [visible]="showConfirmation" 
+            (closeEmitter)="handleCloseConfirmation()"
+            (deleteEmitter)="handleDeleteConfirmation()">
+    </app-confirmation> 
 </div>  

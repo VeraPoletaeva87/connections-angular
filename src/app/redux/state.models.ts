@@ -1,8 +1,8 @@
-import { GroupInfo, UserData } from "../shared/types";
+import { GroupData, UserData } from "../shared/types";
 
 export interface State {
       userInfo: UserData,
-      groupInfo: GroupInfo[]
+      groupInfo: GroupData[]
     }
   
   export const initialState: State = {

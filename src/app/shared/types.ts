@@ -28,7 +28,8 @@ export interface GroupData {
     }
 }    
 
-export interface GroupInfo {
-  data: GroupData,
-  isCustom: boolean
-} 
+export interface UserParams {
+    uid: string | null,
+    email: string | null,
+    token: string | null
+}

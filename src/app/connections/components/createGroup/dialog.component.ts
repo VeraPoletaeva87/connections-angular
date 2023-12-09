@@ -1,6 +1,10 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Store } from '@ngrx/store';
 import { AbstractControl, FormControl, NonNullableFormBuilder, Validators } from '@angular/forms';
 import { LoginService } from '../../../auth/services/login.service';
+import { State } from '../../../redux/state.models';
+import * as GroupActions from '../../../redux/actions/groups.actions';
+import { GroupData } from 'src/app/shared/types';
 
 @Component({
   selector: 'app-dialog',
@@ -10,12 +14,14 @@ import { LoginService } from '../../../auth/services/login.service';
 export class DialogComponent {
   @Input() visible = false;
   @Output() closeEmitter = new EventEmitter();
+  @Output() saveEmitter = new EventEmitter();
 
   submitDisabled = false;
 
   constructor(
     private formBuilder: NonNullableFormBuilder,
     private loginService: LoginService, 
+    private store: Store<State>
   ) {}
 
   createGroupForm = this.formBuilder.group({
@@ -39,6 +45,7 @@ export class DialogComponent {
         }
         const params = this.loginService.getUser();
         this.submitDisabled = true;
+        const creationTime = +new Date();
         fetch('https://tasks.app.rs.school/angular/groups/create', 
          {
            headers: {
@@ -60,9 +67,28 @@ export class DialogComponent {
                    this.loginService.openError(message);
                  });
          } else {
-           this.loginService.openSuccess('Group is successfuly created!');
-           this.submitDisabled = false;
-           this.closeEmitter.emit();   
+          response.clone().json()
+          .then((data) => {
+            const itemData: GroupData = {
+              id: {
+                S: data.groupID
+              },
+              name: {
+                S: formData.name || ''
+              },
+              createdAt: {
+                S: creationTime.toString()
+              },
+              createdBy: {
+                S: params.uid || ''
+              }
+            }
+            this.loginService.openSuccess('Group is successfuly created!');
+            this.submitDisabled = false;
+            this.store.dispatch(GroupActions.AddCustomgroup({item: itemData}));
+            this.closeEmitter.emit();   
+            this.saveEmitter.emit();
+          }); 
          }
      });
        } else {

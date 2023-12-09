@@ -8,9 +8,11 @@ import { ConnectionsRoutingModule } from './connections-routing.modules';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ListComponent } from '../components/groupList/list.component';
 import { DialogComponent } from '../components/createGroup/dialog.component';
+import { ConfirmationComponent } from '../components/confirmation/dialog.component';
 
 @NgModule({
   declarations: [
+    ConfirmationComponent,
     DialogComponent,
     ListComponent,
     MainComponent

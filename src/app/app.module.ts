@@ -10,6 +10,7 @@ import { userInfoReducer } from './redux/reducers/userInfo.reducer';
 import { EffectsModule } from '@ngrx/effects';
 import { ToastrModule } from 'ngx-toastr';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { groupInfoReducer } from './redux/reducers/groups.reducers';
 
 @NgModule({
   declarations: [AppComponent],
@@ -20,7 +21,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     AppRoutingModule,
     HttpClientModule,
     ToastrModule.forRoot(),
-    StoreModule.forRoot({ userInfo: userInfoReducer }, {}),
+    StoreModule.forRoot({ userInfo: userInfoReducer, groupInfo: groupInfoReducer }, {}),
     EffectsModule.forRoot(),
   ],
   providers: [
