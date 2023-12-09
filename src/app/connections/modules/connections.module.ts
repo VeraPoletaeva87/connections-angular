@@ -9,15 +9,20 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { ListComponent } from '../components/groupList/list.component';
 import { DialogComponent } from '../components/createGroup/dialog.component';
 import { ConfirmationComponent } from '../components/confirmation/dialog.component';
+import { CountdownService } from '../services/countdown.service';
+import { PeopleListComponent } from '../components/peopleList/list.component';
+import { ConversationComponent } from '../pages/conversation/conversation.component';
 
 @NgModule({
   declarations: [
     ConfirmationComponent,
+    ConversationComponent,
     DialogComponent,
     ListComponent,
-    MainComponent
+    MainComponent,
+    PeopleListComponent
   ],
-  providers: [DatePipe],
+  providers: [DatePipe, CountdownService],
   imports: [
     CommonModule,
     SharedModule,

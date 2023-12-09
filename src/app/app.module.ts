@@ -11,6 +11,9 @@ import { EffectsModule } from '@ngrx/effects';
 import { ToastrModule } from 'ngx-toastr';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { groupInfoReducer } from './redux/reducers/groups.reducers';
+import { peopleInfoReducer } from './redux/reducers/people.reducer';
+import { conversationReducer } from './redux/reducers/conversation.reducer';
+import { messagesReducer } from './redux/reducers/messages.reducers';
 
 @NgModule({
   declarations: [AppComponent],
@@ -21,7 +24,13 @@ import { groupInfoReducer } from './redux/reducers/groups.reducers';
     AppRoutingModule,
     HttpClientModule,
     ToastrModule.forRoot(),
-    StoreModule.forRoot({ userInfo: userInfoReducer, groupInfo: groupInfoReducer }, {}),
+    StoreModule.forRoot({ 
+      userInfo: userInfoReducer, 
+      groupInfo: groupInfoReducer, 
+      peopleList: peopleInfoReducer,
+      conversationList: conversationReducer,
+      messages: messagesReducer
+     }, {}),
     EffectsModule.forRoot(),
   ],
   providers: [

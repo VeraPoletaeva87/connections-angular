@@ -1,0 +1,28 @@
+.column {
+    display: flex;
+    flex-direction: column;
+    width: 30%;
+  }
+
+.marginS {
+    margin-right: 12px;
+    margin-bottom: 12px;
+}  
+
+.align-right {
+    align-items: end;
+}
+
+.align-left {
+    align-items: start;
+}
+
+.message-item {
+    display: flex;
+    width: 30%;
+    flex-direction: column;
+}
+
+.invalid {
+    color: red;
+}

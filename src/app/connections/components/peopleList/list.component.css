@@ -29,9 +29,6 @@
     margin-bottom: 12px;
 }
 
-.delete {
-    color: #aaaaaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
+.contrast-background {
+    background-color: rgb(243, 243, 183);
 }

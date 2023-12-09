@@ -33,3 +33,33 @@ export interface UserParams {
     email: string | null,
     token: string | null
 }
+
+export interface PeopleInfo {
+    name: {
+      S: string
+    },
+    uid: {
+      S: string
+    }
+}
+
+export interface ConversationData {
+    id: {
+      S: string
+    },
+    companionID: {
+      S: string
+    }
+}
+
+export interface MessageData {
+  authorID: {
+    S: string
+  },
+  message: {
+    S: string
+  },
+  createdAt: {
+    S: string 
+  }
+}

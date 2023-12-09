@@ -5,6 +5,7 @@ import { State } from '../../../redux/state.models';
 import { GroupData, UserParams } from '../../../shared/types';
 import { getGroups } from 'src/app/redux/selectors/groups.selector';
 import * as GroupActions from '../../../redux/actions/groups.actions';
+import { CountdownService } from '../../services/countdown.service';
 
 @Component({
   selector: 'app-list',
@@ -14,6 +15,7 @@ import * as GroupActions from '../../../redux/actions/groups.actions';
 export class ListComponent {
   items: GroupData[] = []; 
   showDialog: boolean = false;
+  isRequesting: boolean = false;
   showConfirmation: boolean = false;
   itemToDelete: string = '';
   params: UserParams = {
@@ -22,13 +24,19 @@ export class ListComponent {
     token: ''
   };
 
+  countdown$ = this.countdownService.countdown$;
+  get updateDisabled() {
+    return this.countdownService.isRunning;
+  }
+
   constructor(
     private loginService: LoginService,
+    private countdownService: CountdownService,
     private store: Store<State>
   ) {}
 
   updateHandler() {
-
+    this.requestGroups();
   }
 
   createHandler() {
@@ -92,7 +100,9 @@ export class ListComponent {
   });
   }
 
+  // update groups list from http request
   requestGroups() {
+    this.isRequesting = true;
      fetch('https://tasks.app.rs.school/angular/groups/list', 
       {
         headers: {
@@ -116,6 +126,8 @@ export class ListComponent {
             this.loginService.openSuccess('Successfuly got group list!');
             this.items = data.Items;
             this.store.dispatch(GroupActions.AddGroups({items: this.items}));
+            this.isRequesting = false;
+            this.countdownService.startCountdown();
           });
       }
   });

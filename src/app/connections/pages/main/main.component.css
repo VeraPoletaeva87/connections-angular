@@ -12,5 +12,13 @@
 
 .flex {
     display: flex;
-    justify-content: space-between;
 }  
+
+.list-block {
+    width: 25%;
+    border-right: 14px solid #dee6ed;
+}
+
+.paddingL {
+    padding-left: 30px;
+}

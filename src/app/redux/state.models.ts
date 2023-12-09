@@ -1,8 +1,11 @@
-import { GroupData, UserData } from "../shared/types";
+import { ConversationData, GroupData, MessageData, PeopleInfo, UserData } from "../shared/types";
 
 export interface State {
       userInfo: UserData,
-      groupInfo: GroupData[]
+      groupInfo: GroupData[],
+      peopleList: PeopleInfo[],
+      conversationList: ConversationData[],
+      messages: MessageData[]
     }
   
   export const initialState: State = {
@@ -20,5 +23,8 @@ export interface State {
         S: ''
       }
     },
-    groupInfo: []
+    groupInfo: [],
+    peopleList: [],
+    conversationList: [],
+    messages: []
   };   
