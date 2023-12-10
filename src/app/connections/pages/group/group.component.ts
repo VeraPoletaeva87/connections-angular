@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { Store, select } from '@ngrx/store';
 import { State } from '../../../redux/state.models';
 import { LoginService } from 'src/app/auth/services/login.service';
-import { getGroups } from 'src/app/redux/selectors/groups.selector';
+import { getGroupById, getGroups } from 'src/app/redux/selectors/groups.selector';
 import { GroupData, MessageData, UserParams } from 'src/app/shared/types';
 import { CountdownService } from '../../services/countdown.service';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -17,15 +17,16 @@ export interface FormattedItem {
 }
 
 @Component({
-  selector: 'app-conversation',
-  templateUrl: './conversation.component.html',
-  styleUrls: ['./conversation.component.css'],
+  selector: 'app-group',
+  templateUrl: './group.component.html',
+  styleUrls: ['./group.component.css'],
 })
-export class ConversationComponent {
+export class GroupComponent {
     items: MessageData[] = []; 
     id: string = '';
     showConfirmation: boolean = false;
     formattedItems: FormattedItem[] =[];
+    canDelete: boolean = false;
     isRequesting: boolean = false;
     params: UserParams = {
       uid: '',
@@ -54,16 +55,16 @@ export class ConversationComponent {
       get message(): AbstractControl<string | null> | null { return this.createMessageForm.get('message'); }
   
     updateHandler() {
-      this.requestMessages(this.id);
+      this.requestGroupMessages(this.id);
     }
 
     sendHandler() {
     if (!this.createMessageForm.invalid) {    
         const formData = {
-           conversationID: this.id,
+           groupID: this.id,
            message: this.createMessageForm.controls.message.value,
         }
-        fetch('https://tasks.app.rs.school/angular/conversations/append', 
+        fetch('https://tasks.app.rs.school/angular/groups/append', 
             {
                headers: {
                  'rs-uid': this.params.uid || '',
@@ -158,9 +159,9 @@ export class ConversationComponent {
     }
   
     // update groups list from http request
-    requestMessages(id: string) {
+    requestGroupMessages(id: string) {
       this.isRequesting = true;
-       fetch(`https://tasks.app.rs.school/angular/conversations/read?conversationID=${id}`, 
+       fetch(` https://tasks.app.rs.school/angular/groups/read?groupID=${id}`, 
         {
           headers: {
             'rs-uid': this.params.uid || '',
@@ -190,8 +191,19 @@ export class ConversationComponent {
         }
     });
     }
+
+    setCanDelete() {
+     this.store.select(getGroupById(this.id)).pipe(
+            tap((item) => {
+              if (item) {
+                this.canDelete = item?.createdBy.S === this.params.uid;
+              }
+            })
+          )
+        .subscribe();    
+    }
   
-    ngOnInit() {
+    ngOnInit() {  
       this.params = this.loginService.getUser();
       return this.store
      .pipe(
@@ -202,10 +214,10 @@ export class ConversationComponent {
              } else {
                 this.route.paramMap.pipe(
                     tap((params) => {
-                      this.id = params.get('id') || '';
-                      this.requestMessages(this.id);
+                        this.id = params.get('id') || '';
+                     this.requestGroupMessages(this.id);
+                     this.setCanDelete();
                     })).subscribe();
-               
              }
        }) 
     }

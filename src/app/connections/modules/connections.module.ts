@@ -12,12 +12,14 @@ import { ConfirmationComponent } from '../components/confirmation/dialog.compone
 import { CountdownService } from '../services/countdown.service';
 import { PeopleListComponent } from '../components/peopleList/list.component';
 import { ConversationComponent } from '../pages/conversation/conversation.component';
+import { GroupComponent } from '../pages/group/group.component';
 
 @NgModule({
   declarations: [
     ConfirmationComponent,
     ConversationComponent,
     DialogComponent,
+    GroupComponent,
     ListComponent,
     MainComponent,
     PeopleListComponent

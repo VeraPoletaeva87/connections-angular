@@ -1,7 +1,9 @@
-<div class="flex">
+<div class="conversation-block">
         <a href="#/main">Go to main page</a>
-        <app-button class="marginS" (click)="deleteHandler()">Delete conversation</app-button>
-        <app-button class="marginS" (click)="updateHandler()" [disabled]="updateDisabled">Update conversation</app-button> 
+        <div class="flex">
+            <app-button class="marginS" (click)="deleteHandler()">Delete conversation</app-button>
+            <app-button class="marginS" (click)="updateHandler()" [disabled]="updateDisabled">Update conversation</app-button> 
+        </div>
         <div *ngIf="updateDisabled" >You can update conversation in: {{countdown$ | async}} seconds</div>
         <div class="message-item {{item.name === 'Me' ? 'align-right' : 'align-left'}}" *ngFor="let item of formattedItems">
             <div class="">{{ item.name }}</div>
@@ -13,10 +15,15 @@
                 <textarea rows="5" cols="100" class="" formControlName="message" required></textarea> 
                 <div *ngIf="message?.invalid && (message?.dirty || message?.touched)" class="invalid">
                     <div *ngIf="message?.errors?.['required']">
-                       Please enter a name
+                       Please enter a message
                     </div>
                </div>      
                 <app-button class="margin-top" (click)="sendHandler()" [disabled]="!message?.value">Send</app-button>
             </form>   
         </div>
+        <app-confirmation [visible]="showConfirmation" 
+            text="Delete conversation?"
+            (closeEmitter)="handleCloseConfirmation()"
+            (deleteEmitter)="handleDeleteConfirmation()">
+        </app-confirmation> 
 </div>

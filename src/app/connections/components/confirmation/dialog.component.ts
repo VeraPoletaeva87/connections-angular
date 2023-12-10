@@ -7,6 +7,8 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 })
 export class ConfirmationComponent {
   @Input() visible = false;
+  @Input() text = '';
+  
   @Output() closeEmitter = new EventEmitter();
   @Output() deleteEmitter = new EventEmitter();
   

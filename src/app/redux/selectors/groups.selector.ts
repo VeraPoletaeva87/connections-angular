@@ -7,3 +7,7 @@ export const getGroups = createSelector(
     (state) => 
     {return state.groupInfo}
 );
+export const getGroupById = (id: string | undefined) => createSelector(
+    selectGroupsState,
+    (state) => state.groupInfo.find((item) => item.id.S === id)
+);

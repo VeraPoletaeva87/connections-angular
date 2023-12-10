@@ -135,7 +135,7 @@ export class ProfileComponent {
         response.clone().json()
           .then((data) => {
             this.item = data;
-            this.item.createdAt.S = new Date(+data.createdAt.S).toDateString();
+            this.item.createdAt.S = new Date(+data.createdAt.S).toLocaleString();
             this.store.dispatch(UserActions.AddUserInfo({item: this.item}));
           });
     }

@@ -21,8 +21,17 @@
     display: flex;
     width: 30%;
     flex-direction: column;
+    border-top: 1px dotted grey;
 }
 
 .invalid {
     color: red;
+}
+
+.flex {
+    display: flex;
+}
+
+.conversation-block {
+    margin-left: 50px;
 }

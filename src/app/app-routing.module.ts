@@ -4,10 +4,12 @@ import { PageNotFoundComponent } from './core/pages/page-not-found/page-not-foun
 import { LoginPageComponent } from './auth/pages/signin-page/form.component';
 import { ProfileComponent } from './auth/pages/profile/profile.component';
 import { ConversationComponent } from './connections/pages/conversation/conversation.component';
+import { GroupComponent } from './connections/pages/group/group.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/signup', pathMatch: 'full' },
   { path: 'conversation/:id', component: ConversationComponent },
+  { path: 'group/:id', component: GroupComponent },
   {
     path: 'signup',
     loadChildren: () =>

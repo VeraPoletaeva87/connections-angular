@@ -6,6 +6,7 @@ import { GroupData, UserParams } from '../../../shared/types';
 import { getGroups } from 'src/app/redux/selectors/groups.selector';
 import * as GroupActions from '../../../redux/actions/groups.actions';
 import { CountdownService } from '../../services/countdown.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-list',
@@ -32,6 +33,7 @@ export class ListComponent {
   constructor(
     private loginService: LoginService,
     private countdownService: CountdownService,
+    private router: Router,
     private store: Store<State>
   ) {}
 
@@ -132,6 +134,9 @@ export class ListComponent {
       }
   });
   }
+
+  itemClickHandler(item: GroupData) {
+    this.router.navigate([`/group/${item.id.S}`]); }
 
   ngOnInit() {
     this.params = this.loginService.getUser();
