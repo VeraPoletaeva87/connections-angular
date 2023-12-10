@@ -33,16 +33,23 @@
     color: #0d6821;
 }
 
+.light {
+    background-color: #e9f7f7;
+}
+
+.beige {
+    background-color: #f1eec8;
+}
+
 .message-item {
     border-radius: 20px;
     padding-right: 12px;
     padding-top: 4px;
-    padding-left: 4px;
+    padding-left: 12px;
     display: flex;
     flex-direction: column;
     align-items: end;
     padding-bottom: 4px;
-    background-color: #e9f7f7;
     margin-bottom: 12px;
     margin-top: 12px;
 }

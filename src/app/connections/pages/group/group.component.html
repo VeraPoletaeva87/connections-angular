@@ -7,7 +7,7 @@
         <div class="marginL blue marginS" *ngIf="updateDisabled" >You can update conversation in: {{countdown$ | async}} seconds</div>
     <div class="messages-area"> 
         <div class="message-block {{item.name === 'Me' ? 'align-right' : 'align-left'}}" *ngFor="let item of formattedItems">
-            <div class="message-item">
+            <div class="message-item  {{item.name === 'Me' ? 'beige' : 'light'}}">
                 <div class="blue small-font">{{ item.name }}</div>
                 <div class="small-font blue">{{ item.date }}</div>
                 <div class="">{{ item.message }}</div>
