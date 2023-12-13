@@ -6,6 +6,7 @@ import { LoginService } from '../../services/login.service';
 import { State } from '../../../redux/state.models';
 import * as UserActions from '../../../redux/actions/userInfo.actions';
 import { getUserInfo } from '../../../redux/selectors/userInfo.selector';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-profile',
@@ -18,13 +19,11 @@ export class ProfileComponent {
   isSaving: boolean = false;
   isLoggingOut: boolean = false;
   newName: string = '';
-  toastMessage: string = '';
-  isToastVisible: boolean = false;
-  mode: string = '';
 
   constructor(
     private store: Store<State>,
     private router: Router,
+    private toastService: ToastService,
     private loginService: LoginService
   ) {}
 
@@ -38,18 +37,6 @@ export class ProfileComponent {
 
   inputChangeHandler(e: Event) {
     this.newName = (e.target as HTMLInputElement).value;
-  }
-
-  showToast(mode: string) {
-    this.mode = mode;
-    this.isToastVisible = true;
-    setTimeout(() => {
-        this.hideToast();
-    }, 3000);
- }
-
-  hideToast() {
-    this.isToastVisible = false;
   }
 
   getHeaders() {
@@ -81,13 +68,11 @@ export class ProfileComponent {
                 throw new Error('Could not parse the JSON');
             })
             .then(({message}) => {
-              this.toastMessage = message;
-              this.showToast('error');
+              this.toastService.showMessage('error', message);
             });
     } else {
         this.loginService.logOut();
-        this.toastMessage = 'User successfuly logged out!';
-        this.showToast('success');
+        this.toastService.showMessage('success', 'User successfuly logged out!');
         this.isLoggingOut = false;
     }
   });
@@ -118,14 +103,12 @@ export class ProfileComponent {
                 throw new Error('Could not parse the JSON');
             })
             .then(({message}) => {
-              this.toastMessage = message;
-              this.showToast('error');
+              this.toastService.showMessage('error', message);
             });
     } else {
         this.item = {uid: this.item.uid, name: {S : this.newName}, email: this.item.email, createdAt: this.item.createdAt} ;
         this.store.dispatch(UserActions.AddUserInfo({item: this.item}));
-        this.toastMessage = 'User name successfuly changed!';
-        this.showToast('success');
+        this.toastService.showMessage('success', 'User name successfuly changed!');
         this.isSaving = false;
     }
   });
@@ -147,8 +130,7 @@ export class ProfileComponent {
                 throw new Error('Could not parse the JSON');
             })
             .then(({message}) => {
-              this.toastMessage = message;
-              this.showToast('error');
+              this.toastService.showMessage('error', message);
             });
     } else {
         response.clone().json()

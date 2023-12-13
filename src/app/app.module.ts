@@ -13,6 +13,7 @@ import { groupInfoReducer } from './redux/reducers/groups.reducers';
 import { peopleInfoReducer } from './redux/reducers/people.reducer';
 import { conversationReducer } from './redux/reducers/conversation.reducer';
 import { messagesReducer } from './redux/reducers/messages.reducers';
+import SharedModule from './shared/modules/shared.module';
 
 @NgModule({
   declarations: [AppComponent],

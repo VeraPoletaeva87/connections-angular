@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { AbstractControl, FormControl, NonNullableFormBuilder, Validators } from '@angular/forms';
 import { LoginService } from '../../services/login.service';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-login-page',
@@ -12,13 +13,11 @@ export class LoginPageComponent {
   constructor(
     private loginService: LoginService, 
     private router: Router,
+    private toastService: ToastService,
     private formBuilder: NonNullableFormBuilder
   ) {}
 
   submitDisabled = false;
-  toastMessage: string = '';
-  isToastVisible: boolean = false;
-  mode: string = '';
 
   loginForm = this.formBuilder.group({
     login: new FormControl('', [Validators.required, Validators.email]),
@@ -27,18 +26,6 @@ export class LoginPageComponent {
 
   get login(): AbstractControl<string | null> | null { return this.loginForm.get('login'); }
   get password(): AbstractControl<string | null> | null { return this.loginForm.get('password'); }
-
-  showToast(mode: string) {
-    this.mode = mode;
-    this.isToastVisible = true;
-    setTimeout(() => {
-        this.hideToast();
-    }, 3000);
- }
-
-  hideToast() {
-    this.isToastVisible = false;
-  }
 
   inputChangeHandler() {
     this.submitDisabled = this.loginForm.invalid;
@@ -69,14 +56,12 @@ export class LoginPageComponent {
                 if (type='NotFoundException') {
                   this.submitDisabled = true;
                 }
-                this.toastMessage = message;
-                this.showToast('error');
+                this.toastService.showMessage('error', message);
               });
       } else {
         response.clone().json()
           .then((data) => {
-            this.toastMessage = 'User successfuly logged in!';
-            this.showToast('success');
+            this.toastService.showMessage('success', 'User successfuly logged in!');
             this.submitDisabled = false;
             this.loginService.saveUser(this.loginForm.controls.login.value || '', data.token, data.uid);
             this.router.navigate(['/main']);

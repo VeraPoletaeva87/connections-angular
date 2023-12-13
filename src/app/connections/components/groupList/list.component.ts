@@ -7,11 +7,13 @@ import { getGroups } from 'src/app/redux/selectors/groups.selector';
 import * as GroupActions from '../../../redux/actions/groups.actions';
 import { CountdownService } from '../../services/countdown.service';
 import { Router } from '@angular/router';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-list',
   templateUrl: './list.component.html',
   styleUrls: ['./list.component.css'],
+  providers: [CountdownService]
 })
 export class ListComponent {
   items: GroupData[] = []; 
@@ -19,9 +21,6 @@ export class ListComponent {
   isRequesting: boolean = false;
   showConfirmation: boolean = false;
   itemToDelete: string = '';
-  toastMessage: string = '';
-  isToastVisible: boolean = false;
-  mode: string = '';
 
   params: UserParams = {
     uid: '',
@@ -37,6 +36,7 @@ export class ListComponent {
   constructor(
     private loginService: LoginService,
     private countdownService: CountdownService,
+    private toastService: ToastService,
     private router: Router,
     private store: Store<State>
   ) {}
@@ -51,18 +51,6 @@ export class ListComponent {
 
   handleCloseDialog() {
     this.showDialog = false;
-  }
-
-  showToast(mode: string) {
-    this.mode = mode;
-    this.isToastVisible = true;
-    setTimeout(() => {
-        this.hideToast();
-    }, 3000);
- }
-
-  hideToast() {
-    this.isToastVisible = false;
   }
 
   // update groups list from store
@@ -107,12 +95,10 @@ export class ListComponent {
                 throw new Error('Could not parse the JSON');
             })
             .then(({message}) => {
-              this.toastMessage = message;
-              this.showToast('error');
+              this.toastService.showMessage('error', message);
             });
     } else {
-        this.toastMessage = 'Group is successfuly deleted!';
-        this.showToast('success');
+        this.toastService.showMessage('success', 'Group is successfuly deleted!');
         this.store.dispatch(GroupActions.DeleteCustomgroup({id: this.itemToDelete}));
         this.updateGroupsFromStore();
         this.showConfirmation = false;
@@ -138,14 +124,12 @@ export class ListComponent {
                   throw new Error('Could not parse the JSON');
               })
               .then(({message}) => {
-                this.toastMessage = message;
-                this.showToast('error');
+                this.toastService.showMessage('error', message);
               });
       } else {
         response.clone().json()
           .then((data) => {
-            this.toastMessage = 'Successfuly got group list!';
-            this.showToast('success');
+            this.toastService.showMessage('success', 'Successfuly got group list!');
             this.items = data.Items;
             this.store.dispatch(GroupActions.AddGroups({items: this.items}));
             this.isRequesting = false;

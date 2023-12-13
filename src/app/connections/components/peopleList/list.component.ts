@@ -8,26 +8,24 @@ import * as ConversationActions from '../../../redux/actions/conversation.action
 import { CountdownService } from '../../services/countdown.service';
 import { getPeople } from 'src/app/redux/selectors/people.selector';
 import { Router } from '@angular/router';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-peoplelist',
   templateUrl: './list.component.html',
   styleUrls: ['./list.component.css'],
+  providers: [CountdownService]
 })
 export class PeopleListComponent {
   items: PeopleInfo[] = []; 
   conversationItems: ConversationData[] = [];
   companionIDs: string[] = [];
   isRequesting: boolean = false;
-  toastMessage: string = '';
-  mode: string = '';
   params: UserParams = {
     uid: '',
     email: '',
     token: ''
   };
-
-  isToastVisible: boolean = false;
 
   countdown$ = this.countdownService.countdown$;
   get updateDisabled() {
@@ -37,6 +35,7 @@ export class PeopleListComponent {
   constructor(
     private loginService: LoginService,
     private countdownService: CountdownService,
+    private toastService: ToastService,
     private router: Router,
     private store: Store<State>
   ) {}
@@ -44,18 +43,6 @@ export class PeopleListComponent {
   updateHandler() {
     this.requestPeople();
   }
-
-  showToast(mode: string) {
-    this.mode = mode;
-    this.isToastVisible = true;
-    setTimeout(() => {
-        this.hideToast();
-    }, 3000);
- }
-
-    hideToast() {
-      this.isToastVisible = false;
-    }
 
   itemClickHandler(item: PeopleInfo) {
     // create conversation if there is no one and redirect to conversation
@@ -84,14 +71,12 @@ export class PeopleListComponent {
                 throw new Error('Could not parse the JSON');
             })
             .then(({message}) => {
-              this.toastMessage = message;
-              this.showToast('error');
+              this.toastService.showMessage('error', message);
             });
     } else {
       response.clone().json()
         .then((data) => {
-          this.toastMessage = 'Successfuly added a new conversation!';
-          this.showToast('success');
+         this.toastService.showMessage('success', 'Successfuly added a new conversation!');
          this.router.navigate([`/conversation/${data.conversationID}`]);
         });
     }
@@ -127,14 +112,12 @@ export class PeopleListComponent {
                   throw new Error('Could not parse the JSON');
               })
               .then(({message}) => {
-                this.toastMessage = message;
-                this.showToast('error');
+                this.toastService.showMessage('error', message);
               });
       } else {
         response.clone().json()
           .then((data) => {
-            this.toastMessage = 'Successfuly got people list!';
-            this.showToast('success');
+            this.toastService.showMessage('success', 'Successfuly got people list!');
             this.items = data.Items.filter((item: PeopleInfo) => item.uid.S !== this.params.uid);
             this.store.dispatch(PeopleActions.AddPeople({items: this.items}));
            // this.requestConversations();
@@ -162,8 +145,7 @@ export class PeopleListComponent {
                   throw new Error('Could not parse the JSON');
               })
               .then(({message}) => {
-                this.toastMessage = message;
-                this.showToast('error');
+                this.toastService.showMessage('error', message);
               });
       } else {
         response.clone().json()

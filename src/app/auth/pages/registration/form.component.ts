@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { AbstractControl, FormControl, NonNullableFormBuilder, Validators } from '@angular/forms';
 import { LoginService } from '../../services/login.service';
 import { passwordStrengthValidator, firstNameValidator } from '../../services/validators';
+import { ToastService } from '../../../core/services/toast.service';
 
 
 @Component({
@@ -13,14 +14,12 @@ import { passwordStrengthValidator, firstNameValidator } from '../../services/va
 export class RegisterPageComponent {
   constructor(
     private loginService: LoginService, 
+    private toastService: ToastService,
     private router: Router,
     private formBuilder: NonNullableFormBuilder
   ) {}
 
   submitDisabled = false;
-  toastMessage: string = '';
-  isToastVisible: boolean = false;
-  mode: string = '';
 
   loginForm = this.formBuilder.group({
     name: new FormControl('',  [Validators.required, Validators.maxLength(40), firstNameValidator()]),
@@ -31,18 +30,6 @@ export class RegisterPageComponent {
   get name(): AbstractControl<string | null> | null { return this.loginForm.get('name'); }
   get login(): AbstractControl<string | null> | null { return this.loginForm.get('login'); }
   get password(): AbstractControl<string | null> | null { return this.loginForm.get('password'); }
-
-  showToast(mode: string) {
-    this.mode = mode;
-    this.isToastVisible = true;
-    setTimeout(() => {
-        this.hideToast();
-    }, 3000);
- }
-
-  hideToast() {
-    this.isToastVisible = false;
-  }
 
   inputChangeHandler() {
     this.submitDisabled = this.loginForm.invalid;
@@ -71,12 +58,10 @@ export class RegisterPageComponent {
                   throw new Error('Could not parse the JSON');
               })
               .then(({message}) => {
-                this.toastMessage = message;
-                this.showToast('error');
+                this.toastService.showMessage('error', message);
               });
       } else {
-        this.toastMessage = 'User is successfuly registered!';
-        this.showToast('success');
+        this.toastService.showMessage('success', 'User is successfuly registered!');
         this.submitDisabled = false;
         this.router.navigate(['/signin']);
       }

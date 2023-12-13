@@ -41,7 +41,7 @@ export class UtilsService {
     formatItems(items: MessageData[], id: string) {
         const personId = items.filter((item) => item.authorID.S !== id).at(0)?.authorID.S; 
         this.formattedItems = [];
-  
+        const sortedItems = items.sort((a, b) => +a.createdAt.S - +b.createdAt.S);
         // if not only mine messages
         if (personId) {
           this.store.select(getPersonByID(personId)).pipe(
@@ -51,12 +51,12 @@ export class UtilsService {
               } else {
                 this.personName = 'user';
               }
-              return this.getFormatted(items, id);
+              return this.getFormatted(sortedItems, id);
             })
           )
         .subscribe(); 
         } else {
-          return this.getFormatted(items, id);
+          return this.getFormatted(sortedItems, id);
         }
         return this.formattedItems;
       }

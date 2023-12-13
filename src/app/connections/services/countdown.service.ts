@@ -1,9 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, debounceTime } from 'rxjs';
 
-@Injectable({
-    providedIn: 'root'
-})
+@Injectable()
 
 export class CountdownService {
     private countdownSubject = new BehaviorSubject<number>(60);

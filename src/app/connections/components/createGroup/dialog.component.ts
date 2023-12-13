@@ -5,6 +5,7 @@ import { LoginService } from '../../../auth/services/login.service';
 import { State } from '../../../redux/state.models';
 import * as GroupActions from '../../../redux/actions/groups.actions';
 import { GroupData } from 'src/app/shared/types';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-dialog',
@@ -17,13 +18,11 @@ export class DialogComponent {
   @Output() saveEmitter = new EventEmitter();
 
   submitDisabled = false;
-  toastMessage: string = '';
-  isToastVisible: boolean = false;
-  mode: string = '';
 
   constructor(
     private formBuilder: NonNullableFormBuilder,
     private loginService: LoginService, 
+    private toastService: ToastService,
     private store: Store<State>
   ) {}
 
@@ -36,18 +35,6 @@ export class DialogComponent {
   closeHandler() {
     this.closeEmitter.emit();   
   } 
-
-  showToast(mode: string) {
-    this.mode = mode;
-    this.isToastVisible = true;
-    setTimeout(() => {
-        this.hideToast();
-    }, 3000);
- }
-
-  hideToast() {
-    this.isToastVisible = false;
-  }
 
   inputChangeHandler() {
     this.submitDisabled = this.createGroupForm.invalid;
@@ -79,8 +66,7 @@ export class DialogComponent {
                      throw new Error('Could not parse the JSON');
                  })
                  .then(({message}) => {
-                  this.toastMessage = message;
-                  this.showToast('error');
+                  this.toastService.showMessage('error', message);
                  });
          } else {
           response.clone().json()
@@ -99,8 +85,7 @@ export class DialogComponent {
                 S: params.uid || ''
               }
             }
-            this.toastMessage = 'Group is successfuly created!';
-            this.showToast('success');
+            this.toastService.showMessage('success', 'Group is successfuly created!');
             this.submitDisabled = false;
             this.store.dispatch(GroupActions.AddCustomgroup({item: itemData}));
             this.closeEmitter.emit();   

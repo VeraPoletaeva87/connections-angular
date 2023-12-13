@@ -3,22 +3,22 @@ import { Store, select } from '@ngrx/store';
 import { State } from '../../../redux/state.models';
 import { LoginService } from 'src/app/auth/services/login.service';
 import { getGroupById, getGroups } from 'src/app/redux/selectors/groups.selector';
-import { FormattedItem, GroupData, MessageData, UserParams } from 'src/app/shared/types';
+import { FormattedItem, GroupData, MessageData, MessageResponse, UserParams } from 'src/app/shared/types';
 import { CountdownService } from '../../services/countdown.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { switchMap, tap } from 'rxjs';
 import { getMessages } from 'src/app/redux/selectors/messages.selectors';
 import { UtilsService } from '../../services/utils.service';
+import { HTTPClientService } from 'src/app/core/services/http.service';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-group',
   templateUrl: './group.component.html',
   styleUrls: ['./group.component.css'],
+  providers: [CountdownService]
 })
 export class GroupComponent {
-  toastMessage: string = '';
-  isToastVisible: boolean = false;
-  mode: string = '';
     items: MessageData[] = []; 
     id: string = '';
     showConfirmation: boolean = false;
@@ -41,57 +41,40 @@ export class GroupComponent {
       private countdownService: CountdownService,
       private utilsService: UtilsService,
       private router: Router,
+      private toastService: ToastService,
+      private httpService: HTTPClientService,
       private store: Store<State>,
       private route: ActivatedRoute
     ) {}
-
-      showToast(mode: string) {
-        this.mode = mode;
-        this.isToastVisible = true;
-        setTimeout(() => {
-            this.hideToast();
-        }, 3000);
-     }
-    
-      hideToast() {
-        this.isToastVisible = false;
-      }
   
     updateHandler() {
       this.requestGroupMessages(this.id);
     }
 
-    handleSend(message: string) {  
+    getHeaders() {
+      return {
+        'rs-uid': this.params.uid || '',
+        'rs-email': this.params.email || '',
+        'Authorization': 'Bearer '+ this.params.token,
+      };
+    }
+
+    handleSend(message: string) { 
       const formData = {
         groupID: this.id,
         message: message,
       }
-      fetch('https://tasks.app.rs.school/angular/groups/append', 
-        {
-          headers: {
-            'rs-uid': this.params.uid || '',
-            'rs-email': this.params.email || '',
-            'Authorization': 'Bearer '+ this.params.token,
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          },
-            method: "POST",
-            body: JSON.stringify(formData)
-          }).then(response => {
-            if (!response.ok) {
-              response.json()
-                .catch(() => {
-                  throw new Error('Could not parse the JSON');
-                })
-                .then(({message}) => {
-                  this.toastMessage = message;
-                  this.showToast('error');
-                });
-            } else {
-              this.toastMessage = 'Message is successfuly sent!';
-              this.showToast('success');
-            }
-        });
+     this.httpService.simpleRequest('https://tasks.app.rs.school/angular/groups/append', 
+     {
+        headers: this.getHeaders(),
+        method: "POST",
+        data: formData 
+    }).then(() => {
+      this.toastService.showMessage('success', 'Message is successfuly sent!');
+      this.requestGroupMessages(this.id);
+    }).catch((message) => {
+      this.toastService.showMessage('error', message);
+    });
     }
 
     handleCloseConfirmation() {
@@ -103,31 +86,17 @@ export class GroupComponent {
     }
   
     handleDeleteConfirmation() {
-      fetch(`https://tasks.app.rs.school/angular/conversations/delete?conversationID=${this.id}`, 
+      this.httpService.simpleRequest(`https://tasks.app.rs.school/angular/groups/delete?groupID=${this.id}`, 
       {
-        headers: {
-          'rs-uid': this.params.uid || '',
-          'rs-email': this.params.email || '',
-          'Authorization': 'Bearer '+ this.params.token
-      },
-        method: "DELETE"
-    }).then(response => {
-      if (!response.ok) {
-         response.json()
-              .catch(() => {
-                  throw new Error('Could not parse the JSON');
-              })
-              .then(({message}) => {
-                this.toastMessage = message;
-                this.showToast('error');
-              });
-      } else {
-          this.toastMessage = 'Successfuly delete conversation!';
-          this.showToast('success');
-          this.showConfirmation = false;
-          this.router.navigate(['/main']);
-      }
-  });
+          headers: this.getHeaders(),
+          method: "DELETE"
+      }).then(() => {
+        this.toastService.showMessage('success', 'Successfuly delete group!');
+        this.showConfirmation = false;
+        this.router.navigate(['/main']);
+      }).catch((message) => {
+        this.toastService.showMessage('error', message);
+      });
     }
    
     // update groups list from store
@@ -141,40 +110,23 @@ export class GroupComponent {
     }
   
     // update groups list from http request
-    requestGroupMessages(id: string) {
-      this.isRequesting = true;
-       fetch(` https://tasks.app.rs.school/angular/groups/read?groupID=${id}`, 
-        {
-          headers: {
-            'rs-uid': this.params.uid || '',
-            'rs-email': this.params.email || '',
-            'Authorization': 'Bearer '+ this.params.token
-        },
-          method: "GET"
-      }).then(response => {
-        if (!response.ok) {
-           response.json()
-                .catch(() => {
-                    throw new Error('Could not parse the JSON');
-                })
-                .then(({message}) => {
-                  this.toastMessage = message;
-                  this.showToast('error');
-                });
-        } else {
-          response.clone().json()
-            .then((data) => {
-              this.toastMessage = 'Successfuly got messages!';
-              this.showToast('success');
-              this.items = data.Items;
-              this.formattedItems = this.utilsService.formatItems(this.items, this.params.uid || '') || [];
-             // this.store.dispatch(GroupActions.AddGroups({items: this.items}));
-              this.isRequesting = false;
-              this.countdownService.startCountdown();
-            });
-        }
+  requestGroupMessages(id: string) {
+    this.isRequesting = true;
+    this.httpService.jsonRequest<MessageResponse>(`https://tasks.app.rs.school/angular/groups/read?groupID=${id}`, 
+    {
+      headers: this.getHeaders(),
+      method: "GET",
+    }).then((data: MessageResponse) => {
+      this.toastService.showMessage('success', 'Successfuly got messages!');
+      this.items = data.Items;
+      this.formattedItems = this.utilsService.formatItems(this.items, this.params.uid || '') || [];
+     // this.store.dispatch(GroupActions.AddGroups({items: this.items}));
+      this.isRequesting = false;
+      this.countdownService.startCountdown();
+    }).catch((message) => {
+      this.toastService.showMessage('error', message);
     });
-    }
+  }
 
     setCanDelete() {
      this.store.select(getGroupById(this.id)).pipe(

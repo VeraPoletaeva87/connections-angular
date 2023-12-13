@@ -1,11 +1,10 @@
 import { NgModule } from '@angular/core';
 
 import { ButtonComponent } from '../../core/components/button/button.component';
-import { ToastComponent } from '../../core/components/toast/toast.component';
 
 @NgModule({
-  declarations: [ButtonComponent, ToastComponent],
+  declarations: [ButtonComponent],
   imports: [],
-  exports: [ButtonComponent, ToastComponent],
+  exports: [ButtonComponent],
 })
 export default class SharedModule {}

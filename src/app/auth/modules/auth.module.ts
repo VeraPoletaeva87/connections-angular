@@ -8,6 +8,7 @@ import { Routes } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthRoutingModule } from './auth-routing.module';
 import { ReactiveFormsModule } from '@angular/forms';
+import CoreModule from 'src/app/core/modules/core.module';
 
 const loginRoutes: Routes = [{ path: '', component: RegisterPageComponent }];
 
@@ -17,6 +18,7 @@ const loginRoutes: Routes = [{ path: '', component: RegisterPageComponent }];
     CommonModule,
     ReactiveFormsModule,
     SharedModule,
+    CoreModule,
     AuthRoutingModule,
   ],
   exports: [],

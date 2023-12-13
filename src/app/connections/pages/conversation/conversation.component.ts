@@ -11,17 +11,16 @@ import { getPersonByID } from 'src/app/redux/selectors/people.selector';
 import * as MessagesActions from '../../../redux/actions/messages.actions';
 import { HTTPClientService } from 'src/app/core/services/http.service';
 import { UtilsService } from '../../services/utils.service';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-conversation',
   templateUrl: './conversation.component.html',
   styleUrls: ['./conversation.component.css'],
+  providers: [CountdownService]
 })
 export class ConversationComponent {
-  toastMessage: string = '';
-  isToastVisible: boolean = false;
   personName: string = '';
-  mode: string = '';
   items: MessageData[] = []; 
   id: string = '';
   showConfirmation: boolean = false;
@@ -42,6 +41,7 @@ export class ConversationComponent {
     private loginService: LoginService,
     private countdownService: CountdownService,
     private httpService: HTTPClientService,
+    private toastService: ToastService,
     private router: Router,
     private utilsService: UtilsService,
     private store: Store<State>,
@@ -52,89 +52,52 @@ export class ConversationComponent {
     this.requestMessages(this.id);
   }
 
-  showToast(mode: string) {
-    this.mode = mode;
-    this.isToastVisible = true;
-    setTimeout(() => {
-      this.hideToast();
-    }, 3000);
-  }
-  
-  hideToast() {
-    this.isToastVisible = false;
+  getHeaders() {
+    return {
+      'rs-uid': this.params.uid || '',
+      'rs-email': this.params.email || '',
+      'Authorization': 'Bearer '+ this.params.token,
+    };
   }
 
-// example() {
-//   request<Record<string, string>, unknown>('https://tasks.app.rs.school/angular/conversations/append', 
-//   {
-//      headers: {
-//        'rs-uid': this.params.uid || '',
-//        'rs-email': this.params.email || '',
-//        'Authorization': 'Bearer '+ this.params.token,
-//      },
-//      method: "POST",
-//      data: formData // TODO
-//  }).then(() => {
-//   this.toastMessage = 'Message is successfuly sent!';
-//   this.showToast('success');
-//   this.createMessageForm.controls.message.reset();
-//   this.requestMessages(this.id);
-//  }).catch((message) => {
-//   this.toastMessage = message;
-//   this.showToast('error');
-//  })
-// }
 
-    getHeaders() {
-      return {
-        'rs-uid': this.params.uid || '',
-        'rs-email': this.params.email || '',
-        'Authorization': 'Bearer '+ this.params.token,
-      };
-    }
-
-
-    handleSend(message: string) {  
-        const formData = {
-           conversationID: this.id,
-           message: message,
-        }
-        this.httpService.simpleRequest('https://tasks.app.rs.school/angular/conversations/append', 
-        {
-           headers: this.getHeaders(),
-           method: "POST",
-           data: formData 
-       }).then(() => {
-        this.toastMessage = 'Message is successfuly sent!';
-        this.showToast('success');
+  handleSend(message: string) {  
+    const formData = {
+        conversationID: this.id,
+        message: message,
+     }
+    this.httpService.simpleRequest('https://tasks.app.rs.school/angular/conversations/append', 
+      {
+        headers: this.getHeaders(),
+        method: "POST",
+        data: formData 
+      }).then(() => {
+        this.toastService.showMessage('success', 'Message is successfuly sent!');
         this.requestMessages(this.id);
-       }).catch((message) => {
-        this.toastMessage = message;
-        this.showToast('error');
-       });
+      }).catch((message) => {
+        this.toastService.showMessage('error', message);
+      });
   }
 
-    handleCloseConfirmation() {
-      this.showConfirmation = false;
-    }
+  handleCloseConfirmation() {
+    this.showConfirmation = false;
+  }
   
-    deleteHandler() {
-      this.showConfirmation = true;
-    }
+  deleteHandler() {
+    this.showConfirmation = true;
+  }
   
-    handleDeleteConfirmation() {
-      this.httpService.simpleRequest(`https://tasks.app.rs.school/angular/conversations/delete?conversationID=${this.id}`, 
-        {
+  handleDeleteConfirmation() {
+    this.httpService.simpleRequest(`https://tasks.app.rs.school/angular/conversations/delete?conversationID=${this.id}`, 
+       {
            headers: this.getHeaders(),
            method: "DELETE"
        }).then(() => {
-        this.toastMessage = 'Successfuly delete conversation!';
-        this.showToast('success');
+        this.toastService.showMessage('success', 'Successfuly delete conversation!');
         this.showConfirmation = false;
         this.router.navigate(['/main']);
        }).catch((message) => {
-        this.toastMessage = message;
-        this.showToast('error');
+        this.toastService.showMessage('error', message);
        });
     }
   
@@ -146,8 +109,7 @@ export class ConversationComponent {
          headers: this.getHeaders(),
          method: "GET",
      }).then((data: MessageResponse) => {
-      this.toastMessage = 'Successfuly got messages!';
-      this.showToast('success');
+      this.toastService.showMessage('success', 'Successfuly got messages!');
       this.items = data?.Items;
       if (this.items.length) {
         this.formattedItems = this.utilsService.formatItems(this.items, this.params.uid || '') || [];
@@ -156,8 +118,7 @@ export class ConversationComponent {
       this.isRequesting = false;
       this.countdownService.startCountdown();
      }).catch((message) => {
-      this.toastMessage = message;
-      this.showToast('error');
+      this.toastService.showMessage('error', message);
      });
     }
   
