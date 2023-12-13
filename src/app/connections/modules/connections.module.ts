@@ -13,6 +13,8 @@ import { CountdownService } from '../services/countdown.service';
 import { PeopleListComponent } from '../components/peopleList/list.component';
 import { ConversationComponent } from '../pages/conversation/conversation.component';
 import { GroupComponent } from '../pages/group/group.component';
+import { MessageBlockComponent } from '../components/messagesArea/messages.component';
+import { UtilsService } from '../services/utils.service';
 
 @NgModule({
   declarations: [
@@ -22,9 +24,10 @@ import { GroupComponent } from '../pages/group/group.component';
     GroupComponent,
     ListComponent,
     MainComponent,
+    MessageBlockComponent,
     PeopleListComponent
   ],
-  providers: [DatePipe, CountdownService],
+  providers: [DatePipe, CountdownService, UtilsService],
   imports: [
     CommonModule,
     SharedModule,

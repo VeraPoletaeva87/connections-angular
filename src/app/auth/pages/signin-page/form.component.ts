@@ -16,6 +16,9 @@ export class LoginPageComponent {
   ) {}
 
   submitDisabled = false;
+  toastMessage: string = '';
+  isToastVisible: boolean = false;
+  mode: string = '';
 
   loginForm = this.formBuilder.group({
     login: new FormControl('', [Validators.required, Validators.email]),
@@ -24,6 +27,18 @@ export class LoginPageComponent {
 
   get login(): AbstractControl<string | null> | null { return this.loginForm.get('login'); }
   get password(): AbstractControl<string | null> | null { return this.loginForm.get('password'); }
+
+  showToast(mode: string) {
+    this.mode = mode;
+    this.isToastVisible = true;
+    setTimeout(() => {
+        this.hideToast();
+    }, 3000);
+ }
+
+  hideToast() {
+    this.isToastVisible = false;
+  }
 
   inputChangeHandler() {
     this.submitDisabled = this.loginForm.invalid;
@@ -54,12 +69,14 @@ export class LoginPageComponent {
                 if (type='NotFoundException') {
                   this.submitDisabled = true;
                 }
-                this.loginService.openError(message);
+                this.toastMessage = message;
+                this.showToast('error');
               });
       } else {
         response.clone().json()
           .then((data) => {
-            this.loginService.openSuccess('User successfuly logged in!');
+            this.toastMessage = 'User successfuly logged in!';
+            this.showToast('success');
             this.submitDisabled = false;
             this.loginService.saveUser(this.loginForm.controls.login.value || '', data.token, data.uid);
             this.router.navigate(['/main']);

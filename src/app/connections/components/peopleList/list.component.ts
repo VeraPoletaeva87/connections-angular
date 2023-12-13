@@ -19,11 +19,15 @@ export class PeopleListComponent {
   conversationItems: ConversationData[] = [];
   companionIDs: string[] = [];
   isRequesting: boolean = false;
+  toastMessage: string = '';
+  mode: string = '';
   params: UserParams = {
     uid: '',
     email: '',
     token: ''
   };
+
+  isToastVisible: boolean = false;
 
   countdown$ = this.countdownService.countdown$;
   get updateDisabled() {
@@ -40,6 +44,18 @@ export class PeopleListComponent {
   updateHandler() {
     this.requestPeople();
   }
+
+  showToast(mode: string) {
+    this.mode = mode;
+    this.isToastVisible = true;
+    setTimeout(() => {
+        this.hideToast();
+    }, 3000);
+ }
+
+    hideToast() {
+      this.isToastVisible = false;
+    }
 
   itemClickHandler(item: PeopleInfo) {
     // create conversation if there is no one and redirect to conversation
@@ -68,12 +84,14 @@ export class PeopleListComponent {
                 throw new Error('Could not parse the JSON');
             })
             .then(({message}) => {
-              this.loginService.openError(message);
+              this.toastMessage = message;
+              this.showToast('error');
             });
     } else {
       response.clone().json()
         .then((data) => {
-          this.loginService.openSuccess('Successfuly added a new conversation!');
+          this.toastMessage = 'Successfuly added a new conversation!';
+          this.showToast('success');
          this.router.navigate([`/conversation/${data.conversationID}`]);
         });
     }
@@ -109,15 +127,17 @@ export class PeopleListComponent {
                   throw new Error('Could not parse the JSON');
               })
               .then(({message}) => {
-                this.loginService.openError(message);
+                this.toastMessage = message;
+                this.showToast('error');
               });
       } else {
         response.clone().json()
           .then((data) => {
-            this.loginService.openSuccess('Successfuly got people list!');
+            this.toastMessage = 'Successfuly got people list!';
+            this.showToast('success');
             this.items = data.Items.filter((item: PeopleInfo) => item.uid.S !== this.params.uid);
             this.store.dispatch(PeopleActions.AddPeople({items: this.items}));
-            this.requestConversations();
+           // this.requestConversations();
             this.isRequesting = false;
             this.countdownService.startCountdown();
           });
@@ -142,7 +162,8 @@ export class PeopleListComponent {
                   throw new Error('Could not parse the JSON');
               })
               .then(({message}) => {
-                this.loginService.openError(message);
+                this.toastMessage = message;
+                this.showToast('error');
               });
       } else {
         response.clone().json()

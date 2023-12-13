@@ -17,6 +17,9 @@ export class DialogComponent {
   @Output() saveEmitter = new EventEmitter();
 
   submitDisabled = false;
+  toastMessage: string = '';
+  isToastVisible: boolean = false;
+  mode: string = '';
 
   constructor(
     private formBuilder: NonNullableFormBuilder,
@@ -33,6 +36,18 @@ export class DialogComponent {
   closeHandler() {
     this.closeEmitter.emit();   
   } 
+
+  showToast(mode: string) {
+    this.mode = mode;
+    this.isToastVisible = true;
+    setTimeout(() => {
+        this.hideToast();
+    }, 3000);
+ }
+
+  hideToast() {
+    this.isToastVisible = false;
+  }
 
   inputChangeHandler() {
     this.submitDisabled = this.createGroupForm.invalid;
@@ -64,7 +79,8 @@ export class DialogComponent {
                      throw new Error('Could not parse the JSON');
                  })
                  .then(({message}) => {
-                   this.loginService.openError(message);
+                  this.toastMessage = message;
+                  this.showToast('error');
                  });
          } else {
           response.clone().json()
@@ -83,7 +99,8 @@ export class DialogComponent {
                 S: params.uid || ''
               }
             }
-            this.loginService.openSuccess('Group is successfuly created!');
+            this.toastMessage = 'Group is successfuly created!';
+            this.showToast('success');
             this.submitDisabled = false;
             this.store.dispatch(GroupActions.AddCustomgroup({item: itemData}));
             this.closeEmitter.emit();   

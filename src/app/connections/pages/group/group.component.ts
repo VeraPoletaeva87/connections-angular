@@ -3,18 +3,12 @@ import { Store, select } from '@ngrx/store';
 import { State } from '../../../redux/state.models';
 import { LoginService } from 'src/app/auth/services/login.service';
 import { getGroupById, getGroups } from 'src/app/redux/selectors/groups.selector';
-import { GroupData, MessageData, UserParams } from 'src/app/shared/types';
+import { FormattedItem, GroupData, MessageData, UserParams } from 'src/app/shared/types';
 import { CountdownService } from '../../services/countdown.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { switchMap, tap } from 'rxjs';
 import { getMessages } from 'src/app/redux/selectors/messages.selectors';
-import { AbstractControl, FormControl, NonNullableFormBuilder, Validators } from '@angular/forms';
-
-export interface FormattedItem {
-    name: string,
-    date: string,
-    message: string
-}
+import { UtilsService } from '../../services/utils.service';
 
 @Component({
   selector: 'app-group',
@@ -22,6 +16,9 @@ export interface FormattedItem {
   styleUrls: ['./group.component.css'],
 })
 export class GroupComponent {
+  toastMessage: string = '';
+  isToastVisible: boolean = false;
+  mode: string = '';
     items: MessageData[] = []; 
     id: string = '';
     showConfirmation: boolean = false;
@@ -41,57 +38,60 @@ export class GroupComponent {
   
     constructor(
       private loginService: LoginService,
-      private formBuilder: NonNullableFormBuilder,
       private countdownService: CountdownService,
+      private utilsService: UtilsService,
       private router: Router,
       private store: Store<State>,
       private route: ActivatedRoute
     ) {}
 
-    createMessageForm = this.formBuilder.group({
-        message: new FormControl('', [Validators.required]),
-      });
+      showToast(mode: string) {
+        this.mode = mode;
+        this.isToastVisible = true;
+        setTimeout(() => {
+            this.hideToast();
+        }, 3000);
+     }
     
-      get message(): AbstractControl<string | null> | null { return this.createMessageForm.get('message'); }
+      hideToast() {
+        this.isToastVisible = false;
+      }
   
     updateHandler() {
       this.requestGroupMessages(this.id);
     }
 
-    sendHandler() {
-    if (!this.createMessageForm.invalid) {    
-        const formData = {
-           groupID: this.id,
-           message: this.createMessageForm.controls.message.value,
-        }
-        fetch('https://tasks.app.rs.school/angular/groups/append', 
-            {
-               headers: {
-                 'rs-uid': this.params.uid || '',
-                 'rs-email': this.params.email || '',
-                 'Authorization': 'Bearer '+ this.params.token,
-                 'Accept': 'application/json',
-                 'Content-Type': 'application/json'
-               },
-               method: "POST",
-               body: JSON.stringify(formData)
-           }).then(response => {
-             if (!response.ok) {
-                response.json()
-                     .catch(() => {
-                         throw new Error('Could not parse the JSON');
-                     })
-                     .then(({message}) => {
-                       this.loginService.openError(message);
-                     });
-             } else {
-                this.loginService.openSuccess('Message is successfuly sent!');
-                this.createMessageForm.controls.message.reset();
-             }
-         });
-    } else {
-        this.createMessageForm.markAllAsTouched();
-    } 
+    handleSend(message: string) {  
+      const formData = {
+        groupID: this.id,
+        message: message,
+      }
+      fetch('https://tasks.app.rs.school/angular/groups/append', 
+        {
+          headers: {
+            'rs-uid': this.params.uid || '',
+            'rs-email': this.params.email || '',
+            'Authorization': 'Bearer '+ this.params.token,
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+            method: "POST",
+            body: JSON.stringify(formData)
+          }).then(response => {
+            if (!response.ok) {
+              response.json()
+                .catch(() => {
+                  throw new Error('Could not parse the JSON');
+                })
+                .then(({message}) => {
+                  this.toastMessage = message;
+                  this.showToast('error');
+                });
+            } else {
+              this.toastMessage = 'Message is successfuly sent!';
+              this.showToast('success');
+            }
+        });
     }
 
     handleCloseConfirmation() {
@@ -118,10 +118,12 @@ export class GroupComponent {
                   throw new Error('Could not parse the JSON');
               })
               .then(({message}) => {
-                this.loginService.openError(message);
+                this.toastMessage = message;
+                this.showToast('error');
               });
       } else {
-          this.loginService.openSuccess('Successfuly delete conversation!');
+          this.toastMessage = 'Successfuly delete conversation!';
+          this.showToast('success');
           this.showConfirmation = false;
           this.router.navigate(['/main']);
       }
@@ -136,26 +138,6 @@ export class GroupComponent {
         ).subscribe((items: MessageData[]) => {
             this.items = items;
         }) 
-    }
-
-    //chage iud to user name or me and format date
-    formatItems() {
-        this.formattedItems = [];
-        this.items.forEach(item => {
-            let newItem ={
-                name:'',
-                date: '',
-                message: ''
-            };
-            if (item.authorID.S === this.params.uid) {
-                newItem.name = 'Me';
-            } else {
-
-            }
-            newItem.date = new Date(+item.createdAt.S).toLocaleString();
-            newItem.message = item.message.S;
-            this.formattedItems.push(newItem);
-        });
     }
   
     // update groups list from http request
@@ -176,14 +158,16 @@ export class GroupComponent {
                     throw new Error('Could not parse the JSON');
                 })
                 .then(({message}) => {
-                  this.loginService.openError(message);
+                  this.toastMessage = message;
+                  this.showToast('error');
                 });
         } else {
           response.clone().json()
             .then((data) => {
-              this.loginService.openSuccess('Successfuly got messages!');
+              this.toastMessage = 'Successfuly got messages!';
+              this.showToast('success');
               this.items = data.Items;
-              this.formatItems();
+              this.formattedItems = this.utilsService.formatItems(this.items, this.params.uid || '') || [];
              // this.store.dispatch(GroupActions.AddGroups({items: this.items}));
               this.isRequesting = false;
               this.countdownService.startCountdown();

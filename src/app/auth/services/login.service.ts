@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { ToastrService } from 'ngx-toastr';
 
 @Injectable({ providedIn: 'root' })
 
@@ -10,15 +9,7 @@ export class LoginService {
     loggedIn: boolean = false;
     private valueObs: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
-    constructor(private router: Router, private toast: ToastrService,) {}
-
-    openSuccess(message: string) {
-        this.toast.success(message);
-      }
-    
-    openError(error: string) {
-        this.toast.error(error);
-      }
+    constructor(private router: Router) {}
 
     setValue(value: boolean): void {
         this.valueObs.next(value);

@@ -19,6 +19,10 @@ export class ListComponent {
   isRequesting: boolean = false;
   showConfirmation: boolean = false;
   itemToDelete: string = '';
+  toastMessage: string = '';
+  isToastVisible: boolean = false;
+  mode: string = '';
+
   params: UserParams = {
     uid: '',
     email: '',
@@ -47,6 +51,18 @@ export class ListComponent {
 
   handleCloseDialog() {
     this.showDialog = false;
+  }
+
+  showToast(mode: string) {
+    this.mode = mode;
+    this.isToastVisible = true;
+    setTimeout(() => {
+        this.hideToast();
+    }, 3000);
+ }
+
+  hideToast() {
+    this.isToastVisible = false;
   }
 
   // update groups list from store
@@ -91,10 +107,12 @@ export class ListComponent {
                 throw new Error('Could not parse the JSON');
             })
             .then(({message}) => {
-              this.loginService.openError(message);
+              this.toastMessage = message;
+              this.showToast('error');
             });
     } else {
-        this.loginService.openSuccess('Group is successfuly deleted!');
+        this.toastMessage = 'Group is successfuly deleted!';
+        this.showToast('success');
         this.store.dispatch(GroupActions.DeleteCustomgroup({id: this.itemToDelete}));
         this.updateGroupsFromStore();
         this.showConfirmation = false;
@@ -120,12 +138,14 @@ export class ListComponent {
                   throw new Error('Could not parse the JSON');
               })
               .then(({message}) => {
-                this.loginService.openError(message);
+                this.toastMessage = message;
+                this.showToast('error');
               });
       } else {
         response.clone().json()
           .then((data) => {
-            this.loginService.openSuccess('Successfuly got group list!');
+            this.toastMessage = 'Successfuly got group list!';
+            this.showToast('success');
             this.items = data.Items;
             this.store.dispatch(GroupActions.AddGroups({items: this.items}));
             this.isRequesting = false;

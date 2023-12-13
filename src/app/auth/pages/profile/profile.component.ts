@@ -18,6 +18,9 @@ export class ProfileComponent {
   isSaving: boolean = false;
   isLoggingOut: boolean = false;
   newName: string = '';
+  toastMessage: string = '';
+  isToastVisible: boolean = false;
+  mode: string = '';
 
   constructor(
     private store: Store<State>,
@@ -37,6 +40,17 @@ export class ProfileComponent {
     this.newName = (e.target as HTMLInputElement).value;
   }
 
+  showToast(mode: string) {
+    this.mode = mode;
+    this.isToastVisible = true;
+    setTimeout(() => {
+        this.hideToast();
+    }, 3000);
+ }
+
+  hideToast() {
+    this.isToastVisible = false;
+  }
 
   getHeaders() {
     const params = this.loginService.getUser();
@@ -67,11 +81,13 @@ export class ProfileComponent {
                 throw new Error('Could not parse the JSON');
             })
             .then(({message}) => {
-              this.loginService.openError(message);
+              this.toastMessage = message;
+              this.showToast('error');
             });
     } else {
         this.loginService.logOut();
-        this.loginService.openSuccess('User successfuly logged out!');
+        this.toastMessage = 'User successfuly logged out!';
+        this.showToast('success');
         this.isLoggingOut = false;
     }
   });
@@ -102,12 +118,14 @@ export class ProfileComponent {
                 throw new Error('Could not parse the JSON');
             })
             .then(({message}) => {
-              this.loginService.openError(message);
+              this.toastMessage = message;
+              this.showToast('error');
             });
     } else {
         this.item = {uid: this.item.uid, name: {S : this.newName}, email: this.item.email, createdAt: this.item.createdAt} ;
         this.store.dispatch(UserActions.AddUserInfo({item: this.item}));
-        this.loginService.openSuccess('User name successfuly changed!');
+        this.toastMessage = 'User name successfuly changed!';
+        this.showToast('success');
         this.isSaving = false;
     }
   });
@@ -129,7 +147,8 @@ export class ProfileComponent {
                 throw new Error('Could not parse the JSON');
             })
             .then(({message}) => {
-              this.loginService.openError(message);
+              this.toastMessage = message;
+              this.showToast('error');
             });
     } else {
         response.clone().json()

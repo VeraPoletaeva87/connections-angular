@@ -63,3 +63,14 @@ export interface MessageData {
     S: string 
   }
 }
+
+export interface MessageResponse {
+    Count: number,
+    Items: MessageData[]
+}
+
+export interface FormattedItem {
+  name: string,
+  date: string,
+  message: string
+}

@@ -18,6 +18,9 @@ export class RegisterPageComponent {
   ) {}
 
   submitDisabled = false;
+  toastMessage: string = '';
+  isToastVisible: boolean = false;
+  mode: string = '';
 
   loginForm = this.formBuilder.group({
     name: new FormControl('',  [Validators.required, Validators.maxLength(40), firstNameValidator()]),
@@ -29,7 +32,17 @@ export class RegisterPageComponent {
   get login(): AbstractControl<string | null> | null { return this.loginForm.get('login'); }
   get password(): AbstractControl<string | null> | null { return this.loginForm.get('password'); }
 
+  showToast(mode: string) {
+    this.mode = mode;
+    this.isToastVisible = true;
+    setTimeout(() => {
+        this.hideToast();
+    }, 3000);
+ }
 
+  hideToast() {
+    this.isToastVisible = false;
+  }
 
   inputChangeHandler() {
     this.submitDisabled = this.loginForm.invalid;
@@ -58,10 +71,12 @@ export class RegisterPageComponent {
                   throw new Error('Could not parse the JSON');
               })
               .then(({message}) => {
-                this.loginService.openError(message);
+                this.toastMessage = message;
+                this.showToast('error');
               });
       } else {
-        this.loginService.openSuccess('User is successfuly registered!');
+        this.toastMessage = 'User is successfuly registered!';
+        this.showToast('success');
         this.submitDisabled = false;
         this.router.navigate(['/signin']);
       }

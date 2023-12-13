@@ -26,4 +26,5 @@
         </ng-container>
     </div>
     <app-button [disabled]="isLoggingOut" (click)="this.logoutHandler()">Log out</app-button> 
+    <app-toast [message]="toastMessage" [show]="isToastVisible" [mode]="mode"></app-toast>
 </div>

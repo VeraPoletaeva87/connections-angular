@@ -1,33 +1,15 @@
 <div class="conversation-block"> 
-        <a class="marginL marginS" href="#/main">Go to main page</a>
-        <div class="flex marginL">
-            <app-button *ngIf="canDelete" class="marginS" (click)="deleteHandler()">Delete conversation</app-button>
-            <app-button class="marginS" (click)="updateHandler()" [disabled]="updateDisabled">Update conversation</app-button> 
-        </div>
-        <div class="marginL blue marginS" *ngIf="updateDisabled" >You can update conversation in: {{countdown$ | async}} seconds</div>
-    <div class="messages-area"> 
-        <div class="message-block {{item.name === 'Me' ? 'align-right' : 'align-left'}}" *ngFor="let item of formattedItems">
-            <div class="message-item  {{item.name === 'Me' ? 'beige' : 'light'}}">
-                <div class="blue small-font">{{ item.name }}</div>
-                <div class="small-font blue">{{ item.date }}</div>
-                <div class="">{{ item.message }}</div>
-            </div>
-        </div>
+    <a class="marginL marginS" href="#/main">Go to main page</a>
+    <div class="flex marginL">
+        <app-button *ngIf="canDelete" class="marginS" (click)="deleteHandler()">Delete conversation</app-button>
+        <app-button class="marginS" (click)="updateHandler()" [disabled]="updateDisabled">Update conversation</app-button> 
     </div>
-    <div> 
-        <form class="column" [formGroup]="createMessageForm">
-            <textarea rows="5" cols="100" class="" formControlName="message" required></textarea> 
-            <div *ngIf="message?.invalid && (message?.dirty || message?.touched)" class="invalid">
-                <div *ngIf="message?.errors?.['required']">
-                   Please enter a message
-                </div>
-           </div>      
-            <app-button class="margin-top" (click)="sendHandler()" [disabled]="!message?.value">Send</app-button>
-        </form>   
-    </div>
+    <div class="marginL blue marginS" *ngIf="updateDisabled" >You can update conversation in: {{countdown$ | async}} seconds</div>
+    <app-messages [formattedItems]="formattedItems" (sendEmitter)="handleSend($event)"></app-messages>
     <app-confirmation [visible]="showConfirmation" 
         text="Delete group?"
         (closeEmitter)="handleCloseConfirmation()"
         (deleteEmitter)="handleDeleteConfirmation()">
     </app-confirmation> 
+    <app-toast [message]="toastMessage" [show]="isToastVisible" [mode]="mode"></app-toast>
 </div>

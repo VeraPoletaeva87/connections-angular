@@ -2,19 +2,15 @@ import { Component } from '@angular/core';
 import { Store, select } from '@ngrx/store';
 import { State } from '../../../redux/state.models';
 import { LoginService } from 'src/app/auth/services/login.service';
-import { getGroups } from 'src/app/redux/selectors/groups.selector';
-import { GroupData, MessageData, UserParams } from 'src/app/shared/types';
+import { FormattedItem, MessageData, MessageResponse, UserParams } from 'src/app/shared/types';
 import { CountdownService } from '../../services/countdown.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { switchMap, tap } from 'rxjs';
+import { tap } from 'rxjs';
 import { getMessages } from 'src/app/redux/selectors/messages.selectors';
-import { AbstractControl, FormControl, NonNullableFormBuilder, Validators } from '@angular/forms';
-
-export interface FormattedItem {
-    name: string,
-    date: string,
-    message: string
-}
+import { getPersonByID } from 'src/app/redux/selectors/people.selector';
+import * as MessagesActions from '../../../redux/actions/messages.actions';
+import { HTTPClientService } from 'src/app/core/services/http.service';
+import { UtilsService } from '../../services/utils.service';
 
 @Component({
   selector: 'app-conversation',
@@ -22,76 +18,101 @@ export interface FormattedItem {
   styleUrls: ['./conversation.component.css'],
 })
 export class ConversationComponent {
-    items: MessageData[] = []; 
-    id: string = '';
-    showConfirmation: boolean = false;
-    formattedItems: FormattedItem[] =[];
-    isRequesting: boolean = false;
-    params: UserParams = {
+  toastMessage: string = '';
+  isToastVisible: boolean = false;
+  personName: string = '';
+  mode: string = '';
+  items: MessageData[] = []; 
+  id: string = '';
+  showConfirmation: boolean = false;
+  formattedItems: FormattedItem[] =[];
+  isRequesting: boolean = false;
+  params: UserParams = {
       uid: '',
       email: '',
       token: ''
-    };
+  };
   
-    countdown$ = this.countdownService.countdown$;
-    get updateDisabled() {
-      return this.countdownService.isRunning;
-    }
+  countdown$ = this.countdownService.countdown$;
+  get updateDisabled() {
+    return this.countdownService.isRunning;
+  }
   
-    constructor(
-      private loginService: LoginService,
-      private formBuilder: NonNullableFormBuilder,
-      private countdownService: CountdownService,
-      private router: Router,
-      private store: Store<State>,
-      private route: ActivatedRoute
-    ) {}
+  constructor(
+    private loginService: LoginService,
+    private countdownService: CountdownService,
+    private httpService: HTTPClientService,
+    private router: Router,
+    private utilsService: UtilsService,
+    private store: Store<State>,
+    private route: ActivatedRoute
+  ) {}
 
-    createMessageForm = this.formBuilder.group({
-        message: new FormControl('', [Validators.required]),
-      });
-    
-      get message(): AbstractControl<string | null> | null { return this.createMessageForm.get('message'); }
+  updateHandler() {
+    this.requestMessages(this.id);
+  }
+
+  showToast(mode: string) {
+    this.mode = mode;
+    this.isToastVisible = true;
+    setTimeout(() => {
+      this.hideToast();
+    }, 3000);
+  }
   
-    updateHandler() {
-      this.requestMessages(this.id);
+  hideToast() {
+    this.isToastVisible = false;
+  }
+
+// example() {
+//   request<Record<string, string>, unknown>('https://tasks.app.rs.school/angular/conversations/append', 
+//   {
+//      headers: {
+//        'rs-uid': this.params.uid || '',
+//        'rs-email': this.params.email || '',
+//        'Authorization': 'Bearer '+ this.params.token,
+//      },
+//      method: "POST",
+//      data: formData // TODO
+//  }).then(() => {
+//   this.toastMessage = 'Message is successfuly sent!';
+//   this.showToast('success');
+//   this.createMessageForm.controls.message.reset();
+//   this.requestMessages(this.id);
+//  }).catch((message) => {
+//   this.toastMessage = message;
+//   this.showToast('error');
+//  })
+// }
+
+    getHeaders() {
+      return {
+        'rs-uid': this.params.uid || '',
+        'rs-email': this.params.email || '',
+        'Authorization': 'Bearer '+ this.params.token,
+      };
     }
 
-    sendHandler() {
-    if (!this.createMessageForm.invalid) {    
+
+    handleSend(message: string) {  
         const formData = {
            conversationID: this.id,
-           message: this.createMessageForm.controls.message.value,
+           message: message,
         }
-        fetch('https://tasks.app.rs.school/angular/conversations/append', 
-            {
-               headers: {
-                 'rs-uid': this.params.uid || '',
-                 'rs-email': this.params.email || '',
-                 'Authorization': 'Bearer '+ this.params.token,
-                 'Accept': 'application/json',
-                 'Content-Type': 'application/json'
-               },
-               method: "POST",
-               body: JSON.stringify(formData)
-           }).then(response => {
-             if (!response.ok) {
-                response.json()
-                     .catch(() => {
-                         throw new Error('Could not parse the JSON');
-                     })
-                     .then(({message}) => {
-                       this.loginService.openError(message);
-                     });
-             } else {
-                this.loginService.openSuccess('Message is successfuly sent!');
-                this.createMessageForm.controls.message.reset();
-             }
-         });
-    } else {
-        this.createMessageForm.markAllAsTouched();
-    } 
-    }
+        this.httpService.simpleRequest('https://tasks.app.rs.school/angular/conversations/append', 
+        {
+           headers: this.getHeaders(),
+           method: "POST",
+           data: formData 
+       }).then(() => {
+        this.toastMessage = 'Message is successfuly sent!';
+        this.showToast('success');
+        this.requestMessages(this.id);
+       }).catch((message) => {
+        this.toastMessage = message;
+        this.showToast('error');
+       });
+  }
 
     handleCloseConfirmation() {
       this.showConfirmation = false;
@@ -102,111 +123,106 @@ export class ConversationComponent {
     }
   
     handleDeleteConfirmation() {
-      fetch(`https://tasks.app.rs.school/angular/conversations/delete?conversationID=${this.id}`, 
-      {
-        headers: {
-          'rs-uid': this.params.uid || '',
-          'rs-email': this.params.email || '',
-          'Authorization': 'Bearer '+ this.params.token
-      },
-        method: "DELETE"
-    }).then(response => {
-      if (!response.ok) {
-         response.json()
-              .catch(() => {
-                  throw new Error('Could not parse the JSON');
-              })
-              .then(({message}) => {
-                this.loginService.openError(message);
-              });
-      } else {
-          this.loginService.openSuccess('Successfuly delete conversation!');
-          this.showConfirmation = false;
-          this.router.navigate(['/main']);
-      }
-  });
-    }
-   
-    // update groups list from store
-    updaterequestMessagesFromStore() {
-      return this.store
-      .pipe(
-        select((state) => getMessages(state))
-        ).subscribe((items: MessageData[]) => {
-            this.items = items;
-        }) 
-    }
-
-    //chage iud to user name or me and format date
-    formatItems() {
-        this.formattedItems = [];
-        this.items.forEach(item => {
-            let newItem ={
-                name:'',
-                date: '',
-                message: ''
-            };
-            if (item.authorID.S === this.params.uid) {
-                newItem.name = 'Me';
-            } else {
-
-            }
-            newItem.date = new Date(+item.createdAt.S).toLocaleString();
-            newItem.message = item.message.S;
-            this.formattedItems.push(newItem);
-        });
+      this.httpService.simpleRequest(`https://tasks.app.rs.school/angular/conversations/delete?conversationID=${this.id}`, 
+        {
+           headers: this.getHeaders(),
+           method: "DELETE"
+       }).then(() => {
+        this.toastMessage = 'Successfuly delete conversation!';
+        this.showToast('success');
+        this.showConfirmation = false;
+        this.router.navigate(['/main']);
+       }).catch((message) => {
+        this.toastMessage = message;
+        this.showToast('error');
+       });
     }
   
     // update groups list from http request
     requestMessages(id: string) {
       this.isRequesting = true;
-       fetch(`https://tasks.app.rs.school/angular/conversations/read?conversationID=${id}`, 
-        {
-          headers: {
-            'rs-uid': this.params.uid || '',
-            'rs-email': this.params.email || '',
-            'Authorization': 'Bearer '+ this.params.token
-        },
-          method: "GET"
-      }).then(response => {
-        if (!response.ok) {
-           response.json()
-                .catch(() => {
-                    throw new Error('Could not parse the JSON');
-                })
-                .then(({message}) => {
-                  this.loginService.openError(message);
-                });
-        } else {
-          response.clone().json()
-            .then((data) => {
-              this.loginService.openSuccess('Successfuly got messages!');
-              this.items = data.Items;
-              this.formatItems();
-             // this.store.dispatch(GroupActions.AddGroups({items: this.items}));
-              this.isRequesting = false;
-              this.countdownService.startCountdown();
-            });
-        }
-    });
+      this.httpService.jsonRequest<MessageResponse>(`https://tasks.app.rs.school/angular/conversations/read?conversationID=${id}`, 
+      {
+         headers: this.getHeaders(),
+         method: "GET",
+     }).then((data: MessageResponse) => {
+      this.toastMessage = 'Successfuly got messages!';
+      this.showToast('success');
+      this.items = data?.Items;
+      if (this.items.length) {
+        this.formattedItems = this.utilsService.formatItems(this.items, this.params.uid || '') || [];
+        this.store.dispatch(MessagesActions.AddMessages({items: this.items}));
+      }
+      this.isRequesting = false;
+      this.countdownService.startCountdown();
+     }).catch((message) => {
+      this.toastMessage = message;
+      this.showToast('error');
+     });
     }
   
     ngOnInit() {
       this.params = this.loginService.getUser();
+      // this.items = [{
+      //   authorID: {
+      //     S: 'qbkcou256a'
+      //   },
+      //   message: {
+      //     S: 'hi'
+      //   },
+      //   createdAt: {
+      //     S: '5555555' 
+      //   }
+      // },
+      // {
+      //   authorID: {
+      //     S: this.params.uid?.toString() || ''
+      //   },
+      //   message: {
+      //     S: 'hfffffffi'
+      //   },
+      //   createdAt: {
+      //     S: '5555555' 
+      //   }
+      // },
+      // {
+      //   authorID: {
+      //     S: 'qbkcou256a'
+      //   },
+      //   message: {
+      //     S: 'aeqweqeq sffewer ukkiluik'
+      //   },
+      //   createdAt: {
+      //     S: '5555555' 
+      //   }
+      // },
+      // {
+      //   authorID: {
+      //     S: 'qbkcou256a'
+      //   },
+      //   message: {
+      //     S: 'fgfdgdsfgdfgdsss'
+      //   },
+      //   createdAt: {
+      //     S: '5555555' 
+      //   }
+      // }];
+      // this.formatItems();
+     
       return this.store
      .pipe(
        select((state) => getMessages(state))
        ).subscribe((items: MessageData[]) => {
            if (items.length) {
                this.items = items;
-             } else {
-                this.route.paramMap.pipe(
-                    tap((params) => {
-                      this.id = params.get('id') || '';
-                      this.requestMessages(this.id);
-                    })).subscribe();
-               
-             }
+            }
+            this.route.paramMap.pipe(
+              tap((params) => {
+                this.id = params.get('id') || '';
+                if (!this.items.length) {
+                  this.requestMessages(this.id);
+                }
+              })).subscribe();
        }) 
-    }
+  }
 }

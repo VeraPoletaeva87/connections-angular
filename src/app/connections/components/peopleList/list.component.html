@@ -1,6 +1,6 @@
 <div>
     <div class="flex baseline">
-        <app-button class="marginS" (click)="updateHandler()" [disabled]="updateDisabled || isRequesting">Update people list</app-button> 
+      <app-button class="marginS" (click)="updateHandler()" [disabled]="updateDisabled || isRequesting">Update people list</app-button> 
     </div>
     <div *ngIf="updateDisabled" >You can update people list in: {{countdown$ | async}} seconds</div>
     <div class="list-block">
@@ -10,4 +10,5 @@
             </div>
         </div>
     </div> 
+    <app-toast [message]="toastMessage" [show]="isToastVisible" [mode]="mode"></app-toast>
 </div> 

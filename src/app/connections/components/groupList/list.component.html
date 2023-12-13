@@ -21,4 +21,5 @@
             (closeEmitter)="handleCloseConfirmation()"
             (deleteEmitter)="handleDeleteConfirmation()">
     </app-confirmation> 
+    <app-toast [message]="toastMessage" [show]="isToastVisible" [mode]="mode"></app-toast>
 </div>  

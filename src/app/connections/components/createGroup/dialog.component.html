@@ -23,4 +23,5 @@
         <app-button class="margin-top" (click)="submitHandler()" [disabled]="submitDisabled">Submit</app-button>       
     </form> 
     </div>
+    <app-toast [message]="toastMessage" [show]="isToastVisible" [mode]="mode"></app-toast>
 </div>

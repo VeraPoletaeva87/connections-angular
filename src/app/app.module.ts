@@ -8,7 +8,6 @@ import { HttpClientModule } from '@angular/common/http';
 import { StoreModule } from '@ngrx/store';
 import { userInfoReducer } from './redux/reducers/userInfo.reducer';
 import { EffectsModule } from '@ngrx/effects';
-import { ToastrModule } from 'ngx-toastr';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { groupInfoReducer } from './redux/reducers/groups.reducers';
 import { peopleInfoReducer } from './redux/reducers/people.reducer';
@@ -23,7 +22,6 @@ import { messagesReducer } from './redux/reducers/messages.reducers';
     CoreModule,
     AppRoutingModule,
     HttpClientModule,
-    ToastrModule.forRoot(),
     StoreModule.forRoot({ 
       userInfo: userInfoReducer, 
       groupInfo: groupInfoReducer, 
