@@ -1,13 +1,12 @@
 import { Component } from '@angular/core';
-import { Store, select } from '@ngrx/store';
+import { Store } from '@ngrx/store';
 import { State } from '../../../redux/state.models';
 import { LoginService } from 'src/app/auth/services/login.service';
 import { FormattedItem, MessageData, MessageResponse, UserParams } from 'src/app/shared/types';
 import { CountdownService } from '../../services/countdown.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { tap } from 'rxjs';
-import { getMessages } from 'src/app/redux/selectors/messages.selectors';
-import { getPersonByID } from 'src/app/redux/selectors/people.selector';
+import { getMessagesById } from 'src/app/redux/selectors/messages.selectors';
 import * as MessagesActions from '../../../redux/actions/messages.actions';
 import { HTTPClientService } from 'src/app/core/services/http.service';
 import { UtilsService } from '../../services/utils.service';
@@ -27,9 +26,9 @@ export class ConversationComponent {
   formattedItems: FormattedItem[] =[];
   isRequesting: boolean = false;
   params: UserParams = {
-      uid: '',
-      email: '',
-      token: ''
+    uid: '',
+    email: '',
+    token: ''
   };
   
   countdown$ = this.countdownService.countdown$;
@@ -60,23 +59,22 @@ export class ConversationComponent {
     };
   }
 
-
   handleSend(message: string) {  
     const formData = {
-        conversationID: this.id,
-        message: message,
-     }
+      conversationID: this.id,
+      message: message,
+    }
     this.httpService.simpleRequest('https://tasks.app.rs.school/angular/conversations/append', 
-      {
-        headers: this.getHeaders(),
-        method: "POST",
-        data: formData 
-      }).then(() => {
-        this.toastService.showMessage('success', 'Message is successfuly sent!');
-        this.requestMessages(this.id);
-      }).catch((message) => {
-        this.toastService.showMessage('error', message);
-      });
+    {
+      headers: this.getHeaders(),
+      method: "POST",
+      data: formData 
+    }).then(() => {
+      this.toastService.showMessage('success', 'Message is successfuly sent!');
+      this.requestMessages(this.id);
+    }).catch((message) => {
+      this.toastService.showMessage('error', message);
+    });
   }
 
   handleCloseConfirmation() {
@@ -89,41 +87,62 @@ export class ConversationComponent {
   
   handleDeleteConfirmation() {
     this.httpService.simpleRequest(`https://tasks.app.rs.school/angular/conversations/delete?conversationID=${this.id}`, 
-       {
-           headers: this.getHeaders(),
-           method: "DELETE"
-       }).then(() => {
-        this.toastService.showMessage('success', 'Successfuly delete conversation!');
-        this.showConfirmation = false;
-        this.router.navigate(['/main']);
-       }).catch((message) => {
-        this.toastService.showMessage('error', message);
-       });
-    }
+    {
+      headers: this.getHeaders(),
+      method: "DELETE"
+    }).then(() => {
+      this.toastService.showMessage('success', 'Successfuly delete conversation!');
+      this.showConfirmation = false;
+      this.router.navigate(['/main']);
+    }).catch((message) => {
+      this.toastService.showMessage('error', message);
+    });
+  }
   
     // update groups list from http request
-    requestMessages(id: string) {
-      this.isRequesting = true;
-      this.httpService.jsonRequest<MessageResponse>(`https://tasks.app.rs.school/angular/conversations/read?conversationID=${id}`, 
-      {
-         headers: this.getHeaders(),
-         method: "GET",
-     }).then((data: MessageResponse) => {
+  requestMessages(id: string) {
+    this.isRequesting = true;
+    this.httpService.jsonRequest<MessageResponse>(`https://tasks.app.rs.school/angular/conversations/read?conversationID=${id}`, 
+    {
+      headers: this.getHeaders(),
+      method: "GET",
+    }).then((data: MessageResponse) => {
       this.toastService.showMessage('success', 'Successfuly got messages!');
       this.items = data?.Items;
       if (this.items.length) {
         this.formattedItems = this.utilsService.formatItems(this.items, this.params.uid || '') || [];
-        this.store.dispatch(MessagesActions.AddMessages({items: this.items}));
+        this.store.dispatch(MessagesActions.AddMessages({ id: this.id, items: this.formattedItems }));
       }
       this.isRequesting = false;
       this.countdownService.startCountdown();
-     }).catch((message) => {
+    }).catch((message) => {
       this.toastService.showMessage('error', message);
-     });
-    }
+    });
+  }
+
+  getMessages(id: string) {
+    this.store.select(getMessagesById(id)).pipe().
+    subscribe((items: FormattedItem[]) => {
+      if (items.length) {
+        this.formattedItems = items;
+      } else {
+        this.requestMessages(this.id);
+      }
+    });
+  }
   
-    ngOnInit() {
-      this.params = this.loginService.getUser();
+  ngOnInit() {  
+    this.params = this.loginService.getUser();
+    return this.route.paramMap.pipe(
+      tap((params) => {
+        this.id = params.get('id') || '';
+        this.getMessages(this.id);
+      })).subscribe();
+  }
+}
+  
+  //  ngOnInit() {
+    //  this.params = this.loginService.getUser();
       // this.items = [{
       //   authorID: {
       //     S: 'qbkcou256a'
@@ -169,21 +188,4 @@ export class ConversationComponent {
       //   }
       // }];
       // this.formatItems();
-     
-      return this.store
-     .pipe(
-       select((state) => getMessages(state))
-       ).subscribe((items: MessageData[]) => {
-           if (items.length) {
-               this.items = items;
-            }
-            this.route.paramMap.pipe(
-              tap((params) => {
-                this.id = params.get('id') || '';
-                if (!this.items.length) {
-                  this.requestMessages(this.id);
-                }
-              })).subscribe();
-       }) 
-  }
-}
+ // }

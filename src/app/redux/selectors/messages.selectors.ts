@@ -7,3 +7,8 @@ export const getMessages = createSelector(
     (state) => 
     {return state.messages}
 );
+
+export const getMessagesById = (id: string) => createSelector(
+    selectMessagesState,
+    (state) => state.messages[id] || []
+);

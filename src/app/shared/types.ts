@@ -64,6 +64,10 @@ export interface MessageData {
   }
 }
 
+export interface PrivateMessages {
+  [key: string]: FormattedItem[]
+}
+
 export interface MessageResponse {
     Count: number,
     Items: MessageData[]

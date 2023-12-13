@@ -3,14 +3,15 @@ import { Store, select } from '@ngrx/store';
 import { State } from '../../../redux/state.models';
 import { LoginService } from 'src/app/auth/services/login.service';
 import { getGroupById, getGroups } from 'src/app/redux/selectors/groups.selector';
-import { FormattedItem, GroupData, MessageData, MessageResponse, UserParams } from 'src/app/shared/types';
+import { FormattedItem, GroupData, MessageData, MessageResponse, PrivateMessages, UserParams } from 'src/app/shared/types';
 import { CountdownService } from '../../services/countdown.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { switchMap, tap } from 'rxjs';
-import { getMessages } from 'src/app/redux/selectors/messages.selectors';
+import { getMessages, getMessagesById } from 'src/app/redux/selectors/messages.selectors';
 import { UtilsService } from '../../services/utils.service';
 import { HTTPClientService } from 'src/app/core/services/http.service';
 import { ToastService } from '../../../core/services/toast.service';
+import * as MessagesActions from '../../../redux/actions/messages.actions';
 
 @Component({
   selector: 'app-group',
@@ -99,15 +100,15 @@ export class GroupComponent {
       });
     }
    
-    // update groups list from store
-    updaterequestMessagesFromStore() {
-      return this.store
-      .pipe(
-        select((state) => getMessages(state))
-        ).subscribe((items: MessageData[]) => {
-            this.items = items;
-        }) 
-    }
+    // // update groups list from store
+    // updaterequestMessagesFromStore() {
+    //   return this.store
+    //   .pipe(
+    //     select((state) => getMessagesById(state))
+    //     ).subscribe((items: MessageData[]) => {
+    //         this.items = items;
+    //     }) 
+    // }
   
     // update groups list from http request
   requestGroupMessages(id: string) {
@@ -120,7 +121,7 @@ export class GroupComponent {
       this.toastService.showMessage('success', 'Successfuly got messages!');
       this.items = data.Items;
       this.formattedItems = this.utilsService.formatItems(this.items, this.params.uid || '') || [];
-     // this.store.dispatch(GroupActions.AddGroups({items: this.items}));
+      this.store.dispatch(MessagesActions.AddMessages({ id: this.id, items: this.formattedItems }));
       this.isRequesting = false;
       this.countdownService.startCountdown();
     }).catch((message) => {
@@ -138,23 +139,25 @@ export class GroupComponent {
           )
         .subscribe();    
     }
+
+    getMessages(id: string) {
+      this.store.select(getMessagesById(id)).pipe(
+       ).subscribe((items: FormattedItem[]) => {
+           if (items.length) {
+               this.formattedItems = items;
+             } else {
+              this.requestGroupMessages(this.id);
+            }
+          });
+    }
   
     ngOnInit() {  
       this.params = this.loginService.getUser();
-      return this.store
-     .pipe(
-       select((state) => getMessages(state))
-       ).subscribe((items: MessageData[]) => {
-           if (items.length) {
-               this.items = items;
-             } else {
-                this.route.paramMap.pipe(
+      return this.route.paramMap.pipe(
                     tap((params) => {
-                        this.id = params.get('id') || '';
-                     this.requestGroupMessages(this.id);
-                     this.setCanDelete();
+                      this.id = params.get('id') || '';
+                      this.getMessages(this.id);
+                      this.setCanDelete();
                     })).subscribe();
-             }
-       }) 
     }
 }

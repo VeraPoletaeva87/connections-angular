@@ -4,5 +4,10 @@ import { initialState } from '../state.models';
 
 export const messagesReducer = createReducer(
   initialState.messages,
-  on(Messages.AddMessages, (state, { items }) => items),
-);
+  on(Messages.AddMessages, (state, { id, items }) => {
+    // state[id] = items;
+    return {
+      ...state,
+      [id]: items
+    };
+  }));

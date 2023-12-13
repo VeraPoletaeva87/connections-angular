@@ -108,12 +108,12 @@ export class PeopleListComponent {
     }).then(response => {
       if (!response.ok) {
          response.json()
-              .catch(() => {
-                  throw new Error('Could not parse the JSON');
-              })
-              .then(({message}) => {
-                this.toastService.showMessage('error', message);
-              });
+          .catch(() => {
+            throw new Error('Could not parse the JSON');
+          })
+          .then(({message}) => {
+            this.toastService.showMessage('error', message);
+          });
       } else {
         response.clone().json()
           .then((data) => {
@@ -141,12 +141,12 @@ export class PeopleListComponent {
     }).then(response => {
       if (!response.ok) {
          response.json()
-              .catch(() => {
-                  throw new Error('Could not parse the JSON');
-              })
-              .then(({message}) => {
-                this.toastService.showMessage('error', message);
-              });
+          .catch(() => {
+            throw new Error('Could not parse the JSON');
+          })
+          .then(({message}) => {
+            this.toastService.showMessage('error', message);
+          });
       } else {
         response.clone().json()
           .then((data) => {
@@ -164,11 +164,11 @@ export class PeopleListComponent {
    .pipe(
      select((state) => getPeople(state))
      ).subscribe((items: PeopleInfo[]) => {
-         if (items.length) {
-             this.items = items;
-           } else {
-             this.requestPeople();
-           }
-     }) 
+        if (items.length) {
+          this.items = items;
+        } else {
+          this.requestPeople();
+        }
+      }) 
   }
 }

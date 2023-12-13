@@ -42,9 +42,9 @@ export class ProfileComponent {
   getHeaders() {
     const params = this.loginService.getUser();
     return {
-        'rs-uid': params.uid || '',
-        'rs-email': params.email || '',
-        'Authorization': 'Bearer '+params.token
+      'rs-uid': params.uid || '',
+      'rs-email': params.email || '',
+      'Authorization': 'Bearer '+params.token
     };
   }
 
