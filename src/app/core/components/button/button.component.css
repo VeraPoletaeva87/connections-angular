@@ -2,8 +2,8 @@
     border: none;
     height: 32px;
     width: 84px;
-    color: white;
-    background-color: #0078b3;
+    color: #efefd3;
+    background-color: #336c4a;
 }
 
 .button:disabled {

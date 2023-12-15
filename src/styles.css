@@ -1,1 +1,18 @@
 /* You can add global styles to this file, and also import other style files */
+.dark-theme {
+    background-color:#322f3a;
+    color: #efefd3;
+}
+
+.light-theme {
+    background-color: rgb(255, 255, 255);
+    color: rgb(0, 0, 0);
+}
+
+.light-theme-list {
+    background-color: #c4dfbb;
+}
+
+.dark-theme-list {
+    background-color: #3d3942;
+}

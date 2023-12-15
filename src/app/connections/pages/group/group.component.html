@@ -1,4 +1,4 @@
-<div class="conversation-block"> 
+<div class="conversation-block" [class.dark-theme]="isDarkTheme"> 
     <a class="marginL marginS" href="#/main">Go to main page</a>
     <div class="flex marginL">
         <app-button *ngIf="canDelete" class="marginS" (click)="deleteHandler()">Delete conversation</app-button>

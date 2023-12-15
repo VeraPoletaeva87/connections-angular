@@ -12,8 +12,25 @@ import { State } from 'src/app/redux/state.models';
 export class UtilsService {
   personName: string = '';
   formattedItems: FormattedItem[] = [];
+  isDarkTheme: boolean = localStorage.getItem('theme') === 'dark';
 
   constructor(private store: Store<State>) {}
+
+  changeTheme() {
+    const theme = localStorage.getItem('theme');
+    if (theme === null) {
+      localStorage.setItem('theme', 'light');
+      this.isDarkTheme = false;
+    } else {
+      if ( theme === 'light' ) {
+        localStorage.setItem('theme', 'dark');
+        this.isDarkTheme = true;
+      } else {
+        localStorage.setItem('theme', 'light');
+        this.isDarkTheme = false;
+      }
+    }
+  }
     
   getFormatted(items: MessageData[], id: string): FormattedItem[] {
     items.forEach(item => {

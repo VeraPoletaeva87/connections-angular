@@ -9,6 +9,7 @@ import { CountdownService } from '../../services/countdown.service';
 import { getPeople } from 'src/app/redux/selectors/people.selector';
 import { Router } from '@angular/router';
 import { ToastService } from '../../../core/services/toast.service';
+import { UtilsService } from '../../services/utils.service';
 
 @Component({
   selector: 'app-peoplelist',
@@ -32,12 +33,17 @@ export class PeopleListComponent {
     return this.countdownService.isRunning;
   }
 
+  get isDarkTheme() {
+    return this.utilsService.isDarkTheme;
+  }
+
   constructor(
     private loginService: LoginService,
     private countdownService: CountdownService,
     private toastService: ToastService,
     private router: Router,
-    private store: Store<State>
+    private store: Store<State>,
+    private utilsService: UtilsService
   ) {}
 
   updateHandler() {
@@ -159,6 +165,7 @@ export class PeopleListComponent {
   }
 
   ngOnInit() {
+    
     this.params = this.loginService.getUser();
     return this.store
    .pipe(

@@ -8,7 +8,6 @@
 
 .list-block {
     width: 250px;
-    background-color: #e4edf1;
     padding: 12px;
     max-height: 600px;
     overflow: scroll;
@@ -21,7 +20,7 @@
 .list-item:hover {
     cursor: pointer;
     text-decoration: underline;
-    color: rgb(50, 50, 119);
+    color: rgb(72, 72, 209);
 }
 
 .marginS {

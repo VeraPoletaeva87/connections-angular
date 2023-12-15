@@ -8,6 +8,7 @@ import * as GroupActions from '../../../redux/actions/groups.actions';
 import { CountdownService } from '../../services/countdown.service';
 import { Router } from '@angular/router';
 import { ToastService } from '../../../core/services/toast.service';
+import { UtilsService } from '../../services/utils.service';
 
 @Component({
   selector: 'app-list',
@@ -16,6 +17,7 @@ import { ToastService } from '../../../core/services/toast.service';
   providers: [CountdownService]
 })
 export class ListComponent {
+  
   items: GroupData[] = []; 
   showDialog: boolean = false;
   isRequesting: boolean = false;
@@ -33,12 +35,17 @@ export class ListComponent {
     return this.countdownService.isRunning;
   }
 
+  get isDarkTheme() {
+    return this.utilsService.isDarkTheme;
+  }
+
   constructor(
     private loginService: LoginService,
     private countdownService: CountdownService,
     private toastService: ToastService,
     private router: Router,
-    private store: Store<State>
+    private store: Store<State>,
+    private utilsService: UtilsService
   ) {}
 
   updateHandler() {

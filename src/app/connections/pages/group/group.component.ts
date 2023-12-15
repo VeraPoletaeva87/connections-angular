@@ -36,6 +36,10 @@ export class GroupComponent {
     get updateDisabled() {
       return this.countdownService.isRunning;
     }
+
+    get isDarkTheme() {
+      return this.utilsService.isDarkTheme;
+    }
   
     constructor(
       private loginService: LoginService,
@@ -151,7 +155,7 @@ export class GroupComponent {
           });
     }
   
-    ngOnInit() {  
+    ngOnInit() { 
       this.params = this.loginService.getUser();
       return this.route.paramMap.pipe(
                     tap((params) => {
