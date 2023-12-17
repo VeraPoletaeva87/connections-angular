@@ -1,14 +1,17 @@
-<div class="messages-area"> 
-    <div class="message-block {{item.name === 'Me' ? 'align-right' : 'align-left'}}" *ngFor="let item of formattedItems">
-        <div class="message-item  {{item.name === 'Me' ? 'beige' : 'light'}}">
-            <div class="blue small-font">{{ item.name }}</div>
-            <div class="small-font blue">{{ item.date }}</div>
-            <div class="">{{ item.message }}</div>
+<div class="messages-area" [class.messages-area-light]="isLight" [class.dark-theme-list]="isDarkTheme$ | async"> 
+    <div class="messages-list">
+        <div class="message-block {{item.name === 'Me' ? 'align-right' : 'align-left'}}" *ngFor="let item of formattedItems">
+        <div class="message-item" [class.light]="isLight" [class.dark]="isDarkTheme$ | async">
+            <div class="small-font">{{ item.name }}</div>
+            <div class="small-font">{{ item.date }}</div>
+            <div>{{ item.message }}</div>
         </div>
     </div>
+    </div>
+
     <div> 
         <form class="column" [formGroup]="createMessageForm">
-            <textarea rows="5" cols="100" class="" formControlName="message" required></textarea> 
+            <textarea rows="5" cols="100" formControlName="message" required></textarea> 
             <div *ngIf="message?.invalid && (message?.dirty || message?.touched)" class="invalid">
                 <div *ngIf="message?.errors?.['required']">
                    Please enter a message

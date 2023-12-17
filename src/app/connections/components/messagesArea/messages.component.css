@@ -15,12 +15,13 @@
     font-size: 12px;
 }
 
-.blue {
+.light {
+    background-color: #e9f7f7;
     color: #0d6821;
 }
 
-.light {
-    background-color: #e9f7f7;
+.dark {
+    background-color: #4d515a;
 }
 
 .beige {
@@ -41,7 +42,6 @@
 }
 
 .messages-area {
-    background-color: #9dbf92;
     padding-left: 8px;
     padding-right: 8px;
 }
@@ -53,4 +53,13 @@
 
 .invalid {
     color: red;
+}
+
+.messages-list {
+    max-height: 400px;
+    overflow: scroll;
+}
+
+.messages-area-light {
+    background-color: #9dbf92;
 }

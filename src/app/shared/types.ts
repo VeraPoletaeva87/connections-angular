@@ -73,6 +73,21 @@ export interface MessageResponse {
     Items: MessageData[]
 }
 
+export interface ConversationResponse {
+  Count: number,
+  Items: ConversationData[]
+}
+
+export interface GroupsResponse {
+  Count: number,
+  Items: GroupData[]
+}
+
+export interface PeopleResponse {
+  Count: number,
+  Items: PeopleInfo[]
+}
+
 export interface FormattedItem {
   name: string,
   date: string,

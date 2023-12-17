@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { NonNullableFormBuilder, FormControl, Validators, AbstractControl } from '@angular/forms';
+import { ThemeService } from 'src/app/core/services/theme.service';
 
 export interface FormattedItem {
     name: string,
@@ -16,9 +17,15 @@ export class MessageBlockComponent {
     @Input() formattedItems: FormattedItem[] = [];
     @Output() sendEmitter = new EventEmitter();
 
+    isDarkTheme$ = this.themeService.isDarkTheme$;
+    get isLight() {
+      return !this.themeService.isDark;
+    }
+
     constructor(
-        private formBuilder: NonNullableFormBuilder
-      ) {}
+        private formBuilder: NonNullableFormBuilder,
+        private themeService: ThemeService
+    ) {}
 
     createMessageForm = this.formBuilder.group({
         message: new FormControl('', [Validators.required]),

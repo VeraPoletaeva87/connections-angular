@@ -1,4 +1,4 @@
-<div class="conversation-block">
+<div class="conversation-block" [class.light-theme-block]="isLight" [class.dark-theme]="isDarkTheme$ | async">
         <a href="#/main">Go to main page</a>
         <div class="flex">
             <app-button class="marginS" (click)="deleteHandler()">Delete conversation</app-button>

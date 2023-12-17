@@ -2,14 +2,14 @@ import { Component } from '@angular/core';
 import { Store, select } from '@ngrx/store';
 import { LoginService } from '../../../auth/services/login.service';
 import { State } from '../../../redux/state.models';
-import { GroupData, UserParams } from '../../../shared/types';
+import { GroupData, GroupsResponse, UserParams } from '../../../shared/types';
 import { getGroups } from 'src/app/redux/selectors/groups.selector';
 import * as GroupActions from '../../../redux/actions/groups.actions';
 import { CountdownService } from '../../services/countdown.service';
 import { Router } from '@angular/router';
 import { ToastService } from '../../../core/services/toast.service';
-import { UtilsService } from '../../services/utils.service';
 import { ThemeService } from '../../../core/services/theme.service';
+import { HTTPClientService } from 'src/app/core/services/http.service';
 
 @Component({
   selector: 'app-list',
@@ -36,12 +36,16 @@ export class ListComponent {
   }
 
   isDarkTheme$ = this.themeService.isDarkTheme$;
+  get isLight() {
+    return !this.themeService.isDark;
+  }
 
   constructor(
     private loginService: LoginService,
     private countdownService: CountdownService,
     private toastService: ToastService,
     private themeService: ThemeService,
+    private httpService: HTTPClientService,
     private router: Router,
     private store: Store<State>
   ) {}
@@ -82,29 +86,16 @@ export class ListComponent {
 
   handleDeleteConfirmation() {
     const params = this.loginService.getUser();
-    fetch(
-      `https://tasks.app.rs.school/angular/groups/delete?groupID=${this.itemToDelete}`,
-      {
-        headers: {
-          'rs-uid': params.uid || '',
-          'rs-email': params.email || '',
-          Authorization: 'Bearer ' + params.token,
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-        method: 'DELETE',
-      }
-    ).then((response) => {
-      if (!response.ok) {
-        response
-          .json()
-          .catch(() => {
-            throw new Error('Could not parse the JSON');
-          })
-          .then(({ message }) => {
-            this.toastService.showMessage('error', message);
-          });
-      } else {
+
+    this.httpService
+      .simpleRequest(
+        `https://tasks.app.rs.school/angular/groups/delete?groupID=${this.itemToDelete}`,
+        {
+          headers: this.httpService.getHeaders(this.params),
+          method: 'DELETE',
+        }
+      )
+      .then(() => {
         this.toastService.showMessage(
           'success',
           'Group is successfuly deleted!'
@@ -114,46 +105,33 @@ export class ListComponent {
         );
         this.updateGroupsFromStore();
         this.showConfirmation = false;
-      }
-    });
+      })
+      .catch((message) => {
+        this.toastService.showMessage('error', message);
+      });
   }
 
   // update groups list from http request
   requestGroups() {
     this.isRequesting = true;
-    fetch('https://tasks.app.rs.school/angular/groups/list', {
-      headers: {
-        'rs-uid': this.params.uid || '',
-        'rs-email': this.params.email || '',
-        Authorization: 'Bearer ' + this.params.token,
-      },
-      method: 'GET',
-    }).then((response) => {
-      if (!response.ok) {
-        response
-          .json()
-          .catch(() => {
-            throw new Error('Could not parse the JSON');
-          })
-          .then(({ message }) => {
-            this.toastService.showMessage('error', message);
-          });
-      } else {
-        response
-          .clone()
-          .json()
-          .then((data) => {
-            this.toastService.showMessage(
-              'success',
-              'Successfuly got group list!'
-            );
-            this.items = data.Items;
-            this.store.dispatch(GroupActions.AddGroups({ items: this.items }));
-            this.isRequesting = false;
-            this.countdownService.startCountdown();
-          });
-      }
-    });
+    this.httpService
+      .jsonRequest<GroupsResponse>(
+        'https://tasks.app.rs.school/angular/groups/list',
+        {
+          headers: this.httpService.getHeaders(this.params),
+          method: 'GET',
+        }
+      )
+      .then((data: GroupsResponse) => {
+        this.toastService.showMessage('success', 'Successfuly got group list!');
+        this.items = data.Items;
+        this.store.dispatch(GroupActions.AddGroups({ items: this.items }));
+        this.isRequesting = false;
+        this.countdownService.startCountdown();
+      })
+      .catch((message) => {
+        this.toastService.showMessage('error', message);
+      });
   }
 
   itemClickHandler(item: GroupData) {

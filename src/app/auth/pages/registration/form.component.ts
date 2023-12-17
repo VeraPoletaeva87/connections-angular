@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { AbstractControl, FormControl, NonNullableFormBuilder, Validators } from '@angular/forms';
-import { LoginService } from '../../services/login.service';
 import { passwordStrengthValidator, firstNameValidator } from '../../services/validators';
 import { ToastService } from '../../../core/services/toast.service';
+import { HTTPClientService } from 'src/app/core/services/http.service';
 
 
 @Component({
@@ -13,7 +13,7 @@ import { ToastService } from '../../../core/services/toast.service';
 })
 export class RegisterPageComponent {
   constructor(
-    private loginService: LoginService, 
+    private httpService: HTTPClientService,
     private toastService: ToastService,
     private router: Router,
     private formBuilder: NonNullableFormBuilder
@@ -43,29 +43,23 @@ export class RegisterPageComponent {
       password: this.loginForm.controls.password.value
      }
      this.submitDisabled = true;
-     fetch('https://tasks.app.rs.school/angular/registration', 
-      {
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-        method: "POST",
-        body: JSON.stringify(formData)
-    }).then(response => {
-      if (!response.ok) {
-         response.json()
-              .catch(() => {
-                  throw new Error('Could not parse the JSON');
-              })
-              .then(({message}) => {
-                this.toastService.showMessage('error', message);
-              });
-      } else {
-        this.toastService.showMessage('success', 'User is successfuly registered!');
-        this.submitDisabled = false;
-        this.router.navigate(['/signin']);
-      }
-  });
+
+     this.httpService
+     .simpleRequest(
+       'https://tasks.app.rs.school/angular/registration',
+       {
+         method: 'POST',
+         data: formData
+       }
+     )
+     .then(() => {
+       this.toastService.showMessage('success', 'User is successfuly registered!');
+       this.submitDisabled = false;
+       this.router.navigate(['/signin']);
+     })
+     .catch((message) => {
+       this.toastService.showMessage('error', message);
+     });
     } else {
       this.loginForm.markAllAsTouched();
     }

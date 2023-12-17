@@ -1,13 +1,13 @@
 import { Component } from '@angular/core';
-import { Store, select } from '@ngrx/store';
+import { Store } from '@ngrx/store';
 import { State } from '../../../redux/state.models';
 import { LoginService } from 'src/app/auth/services/login.service';
-import { getGroupById, getGroups } from 'src/app/redux/selectors/groups.selector';
-import { FormattedItem, GroupData, MessageData, MessageResponse, PrivateMessages, UserParams } from 'src/app/shared/types';
+import { getGroupById } from 'src/app/redux/selectors/groups.selector';
+import { FormattedItem, MessageData, MessageResponse, PrivateMessages, UserParams } from 'src/app/shared/types';
 import { CountdownService } from '../../services/countdown.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { switchMap, tap } from 'rxjs';
-import { getMessages, getMessagesById } from 'src/app/redux/selectors/messages.selectors';
+import { tap } from 'rxjs';
+import { getMessagesById } from 'src/app/redux/selectors/messages.selectors';
 import { UtilsService } from '../../services/utils.service';
 import { HTTPClientService } from 'src/app/core/services/http.service';
 import { ToastService } from '../../../core/services/toast.service';
@@ -39,6 +39,9 @@ export class GroupComponent {
   }
 
   isDarkTheme$ = this.themeService.isDarkTheme$;
+  get isLight() {
+    return !this.themeService.isDark;
+  }
 
   constructor(
     private loginService: LoginService,
@@ -56,14 +59,6 @@ export class GroupComponent {
     this.requestGroupMessages(this.id);
   }
 
-  getHeaders() {
-    return {
-      'rs-uid': this.params.uid || '',
-      'rs-email': this.params.email || '',
-      Authorization: 'Bearer ' + this.params.token,
-    };
-  }
-
   handleSend(message: string) {
     const formData = {
       groupID: this.id,
@@ -71,7 +66,7 @@ export class GroupComponent {
     };
     this.httpService
       .simpleRequest('https://tasks.app.rs.school/angular/groups/append', {
-        headers: this.getHeaders(),
+        headers: this.httpService.getHeaders(this.params),
         method: 'POST',
         data: formData,
       })
@@ -100,7 +95,7 @@ export class GroupComponent {
       .simpleRequest(
         `https://tasks.app.rs.school/angular/groups/delete?groupID=${this.id}`,
         {
-          headers: this.getHeaders(),
+          headers: this.httpService.getHeaders(this.params),
           method: 'DELETE',
         }
       )
@@ -114,16 +109,6 @@ export class GroupComponent {
       });
   }
 
-  // // update groups list from store
-  // updaterequestMessagesFromStore() {
-  //   return this.store
-  //   .pipe(
-  //     select((state) => getMessagesById(state))
-  //     ).subscribe((items: MessageData[]) => {
-  //         this.items = items;
-  //     })
-  // }
-
   // update groups list from http request
   requestGroupMessages(id: string) {
     this.isRequesting = true;
@@ -131,7 +116,7 @@ export class GroupComponent {
       .jsonRequest<MessageResponse>(
         `https://tasks.app.rs.school/angular/groups/read?groupID=${id}`,
         {
-          headers: this.getHeaders(),
+          headers: this.httpService.getHeaders(this.params),
           method: 'GET',
         }
       )

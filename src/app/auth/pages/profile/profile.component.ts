@@ -7,6 +7,7 @@ import { State } from '../../../redux/state.models';
 import * as UserActions from '../../../redux/actions/userInfo.actions';
 import { getUserInfo } from '../../../redux/selectors/userInfo.selector';
 import { ToastService } from '../../../core/services/toast.service';
+import { HTTPClientService } from 'src/app/core/services/http.service';
 
 @Component({
   selector: 'app-profile',
@@ -23,6 +24,7 @@ export class ProfileComponent {
   constructor(
     private store: Store<State>,
     private router: Router,
+    private httpService: HTTPClientService,
     private toastService: ToastService,
     private loginService: LoginService
   ) {}
@@ -35,112 +37,82 @@ export class ProfileComponent {
     this.isEditing = false;
   }
 
-  inputChangeHandler(e: Event) {
-    this.newName = (e.target as HTMLInputElement).value;
+  backHandler() {
+    this.router.navigate(['/main']);
   }
 
-  getHeaders() {
-    const params = this.loginService.getUser();
-    return {
-      'rs-uid': params.uid || '',
-      'rs-email': params.email || '',
-      'Authorization': 'Bearer '+params.token
-    };
+  inputChangeHandler(e: Event) {
+    this.newName = (e.target as HTMLInputElement).value;
   }
 
   logoutHandler() {
     this.isLoggingOut = true;
     const params = this.loginService.getUser();
-    fetch('https://tasks.app.rs.school/angular/logout', 
-    {
-      headers: {
-        'rs-uid': params.uid || '',
-        'rs-email': params.email || '',
-        'Authorization': 'Bearer '+params.token,
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      method: "DELETE"
-  }).then(response => {
-    if (!response.ok) {
-       response.json()
-            .catch(() => {
-                throw new Error('Could not parse the JSON');
-            })
-            .then(({message}) => {
-              this.toastService.showMessage('error', message);
-            });
-    } else {
-        this.loginService.logOut();
-        this.toastService.showMessage('success', 'User successfuly logged out!');
-        this.isLoggingOut = false;
-    }
-  });
+
+    this.httpService
+    .simpleRequest(
+      'https://tasks.app.rs.school/angular/logout',
+      {
+        headers: this.httpService.getHeaders(params),
+        method: 'DELETE'
+      }
+    )
+    .then(() => {
+      this.loginService.logOut();
+      this.toastService.showMessage('success', 'User successfuly logged out!');
+      this.isLoggingOut = false;
+    })
+    .catch((message) => {
+      this.toastService.showMessage('error', message);
+    });
   }
 
   saveHandler() {
-    this.isSaving = true;
     const params = this.loginService.getUser();
+    this.isSaving = true;
     const formData = {
         name: this.newName
     };
 
-    fetch('https://tasks.app.rs.school/angular/profile', 
-    {
-      headers: {
-        'rs-uid': params.uid || '',
-        'rs-email': params.email || '',
-        'Authorization': 'Bearer '+params.token,
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      method: "PUT",
-      body: JSON.stringify(formData)
-  }).then(response => {
-    if (!response.ok) {
-       response.json()
-            .catch(() => {
-                throw new Error('Could not parse the JSON');
-            })
-            .then(({message}) => {
-              this.toastService.showMessage('error', message);
-            });
-    } else {
-        this.item = {uid: this.item.uid, name: {S : this.newName}, email: this.item.email, createdAt: this.item.createdAt} ;
-        this.store.dispatch(UserActions.AddUserInfo({item: this.item}));
-        this.toastService.showMessage('success', 'User name successfuly changed!');
-        this.isSaving = false;
-    }
-  });
+    this.httpService
+    .simpleRequest(
+      'https://tasks.app.rs.school/angular/profile',
+      {
+        headers: this.httpService.getHeaders(params),
+        method: 'PUT',
+        data: formData
+      }
+    )
+    .then(() => {
+      this.item = {uid: this.item.uid, name: {S : this.newName}, email: this.item.email, createdAt: this.item.createdAt} ;
+      this.store.dispatch(UserActions.AddUserInfo({item: this.item}));
+      this.toastService.showMessage('success', 'User name successfuly changed!');
+      this.isSaving = false;
+      this.isEditing = false;
+    })
+    .catch((message) => {
+      this.toastService.showMessage('error', message);
+    });
 }
 
   requestProfile = () => {
     const params = this.loginService.getUser();
-    fetch('https://tasks.app.rs.school/angular/profile', {
-        headers: {
-            'rs-uid': params.uid || '',
-            'rs-email': params.email || '',
-            'Authorization': 'Bearer '+params.token
-        },
-        method: "GET"
-    }).then(response => {
-    if (!response.ok) {
-       response.json()
-            .catch(() => {
-                throw new Error('Could not parse the JSON');
-            })
-            .then(({message}) => {
-              this.toastService.showMessage('error', message);
-            });
-    } else {
-        response.clone().json()
-          .then((data) => {
-            this.item = data;
-            this.item.createdAt.S = new Date(+data.createdAt.S).toLocaleString();
-            this.store.dispatch(UserActions.AddUserInfo({item: this.item}));
-          });
-    }
-});
+    this.httpService
+    .jsonRequest<UserData>(
+      'https://tasks.app.rs.school/angular/profile',
+      {
+        headers: this.httpService.getHeaders(params),
+        method: 'GET',
+      }
+    )
+    .then((data: UserData) => {
+      this.item = data;
+      this.item.createdAt.S = new Date(+data.createdAt.S).toLocaleString();
+      this.store.dispatch(UserActions.AddUserInfo({item: this.item}));
+    })
+    .catch((message) => {
+      this.toastService.showMessage('error', message);
+    });
   }
 
   ngOnInit() {

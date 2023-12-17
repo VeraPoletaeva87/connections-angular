@@ -6,6 +6,8 @@ import {
   UserParams,
   PeopleInfo,
   ConversationData,
+  PeopleResponse,
+  ConversationResponse,
 } from '../../../shared/types';
 import * as PeopleActions from '../../../redux/actions/people.actions';
 import * as ConversationActions from '../../../redux/actions/conversation.actions';
@@ -13,8 +15,8 @@ import { CountdownService } from '../../services/countdown.service';
 import { getPeople } from 'src/app/redux/selectors/people.selector';
 import { Router } from '@angular/router';
 import { ToastService } from '../../../core/services/toast.service';
-import { UtilsService } from '../../services/utils.service';
 import { ThemeService } from '../../../core/services/theme.service';
+import { HTTPClientService } from 'src/app/core/services/http.service';
 
 @Component({
   selector: 'app-peoplelist',
@@ -39,15 +41,18 @@ export class PeopleListComponent {
   }
 
   isDarkTheme$ = this.themeService.isDarkTheme$;
+  get isLight() {
+    return !this.themeService.isDark;
+  }
 
   constructor(
     private loginService: LoginService,
     private countdownService: CountdownService,
     private toastService: ToastService,
     private themeService: ThemeService,
+    private httpService: HTTPClientService,
     private router: Router,
-    private store: Store<State>,
-    private utilsService: UtilsService
+    private store: Store<State>
   ) {}
 
   updateHandler() {
@@ -84,14 +89,9 @@ export class PeopleListComponent {
               this.toastService.showMessage('error', message);
             });
         } else {
-          response
-            .clone()
-            .json()
+          response.clone().json()
             .then((data) => {
-              this.toastService.showMessage(
-                'success',
-                'Successfuly added a new conversation!'
-              );
+              this.toastService.showMessage('success', 'Successfuly added a new conversation!');
               this.router.navigate([`/conversation/${data.conversationID}`]);
             });
         }
@@ -111,79 +111,49 @@ export class PeopleListComponent {
   // update people list from http request
   requestPeople() {
     this.isRequesting = true;
-    fetch('https://tasks.app.rs.school/angular/users', {
-      headers: {
-        'rs-uid': this.params.uid || '',
-        'rs-email': this.params.email || '',
-        Authorization: 'Bearer ' + this.params.token,
-      },
-      method: 'GET',
-    }).then((response) => {
-      if (!response.ok) {
-        response
-          .json()
-          .catch(() => {
-            throw new Error('Could not parse the JSON');
-          })
-          .then(({ message }) => {
-            this.toastService.showMessage('error', message);
-          });
-      } else {
-        response
-          .clone()
-          .json()
-          .then((data) => {
-            this.toastService.showMessage(
-              'success',
-              'Successfuly got people list!'
-            );
-            this.items = data.Items.filter(
-              (item: PeopleInfo) => item.uid.S !== this.params.uid
-            );
-            this.store.dispatch(PeopleActions.AddPeople({ items: this.items }));
-            // this.requestConversations();
-            this.isRequesting = false;
-            this.countdownService.startCountdown();
-          });
+    this.httpService
+    .jsonRequest<PeopleResponse>(
+      'https://tasks.app.rs.school/angular/users',
+      {
+        headers: this.httpService.getHeaders(this.params),
+        method: 'GET',
       }
+    )
+    .then((data: PeopleResponse) => {
+      this.toastService.showMessage('success', 'Successfuly got people list!');
+      this.items = data.Items.filter((item: PeopleInfo) => item.uid.S !== this.params.uid);
+      this.store.dispatch(PeopleActions.AddPeople({ items: this.items }));
+      // this.requestConversations();
+      this.isRequesting = false;
+      this.countdownService.startCountdown();
+    })
+    .catch((message) => {
+      this.toastService.showMessage('error', message);
     });
   }
 
   // update covnersation list from http request
   requestConversations() {
-    fetch('https://tasks.app.rs.school/angular/conversations/list', {
-      headers: {
-        'rs-uid': this.params.uid || '',
-        'rs-email': this.params.email || '',
-        Authorization: 'Bearer ' + this.params.token,
-      },
-      method: 'GET',
-    }).then((response) => {
-      if (!response.ok) {
-        response
-          .json()
-          .catch(() => {
-            throw new Error('Could not parse the JSON');
-          })
-          .then(({ message }) => {
-            this.toastService.showMessage('error', message);
-          });
-      } else {
-        response
-          .clone()
-          .json()
-          .then((data) => {
-            this.conversationItems = data.Items;
-            this.companionIDs = this.conversationItems.map(
-              (item) => item.companionID.S
-            );
-            this.store.dispatch(
-              ConversationActions.AddConversations({
-                items: this.conversationItems,
-              })
-            );
-          });
+    this.httpService.jsonRequest<ConversationResponse>(
+      'https://tasks.app.rs.school/angular/conversations/list',
+      {
+        headers: this.httpService.getHeaders(this.params),
+        method: 'GET',
       }
+    )
+    .then((data: ConversationResponse) => {
+      this.conversationItems = data.Items;
+      this.companionIDs = this.conversationItems.map(
+        (item) => item.companionID.S
+      );
+      this.store.dispatch(
+        ConversationActions.AddConversations({
+          items: this.conversationItems,
+        })
+      );
+    })
+    .catch((message) => {
+      this.toastService.showMessage('error', message);
     });
   }
 

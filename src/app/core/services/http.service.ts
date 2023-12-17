@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { UserParams } from 'src/app/shared/types';
 
 interface RequestParams<TRequestData = undefined> extends Omit<RequestInit, 'body'> {
    data?: TRequestData;
@@ -7,6 +8,14 @@ interface RequestParams<TRequestData = undefined> extends Omit<RequestInit, 'bod
 @Injectable({ providedIn: 'root' })
    
 export class HTTPClientService { 
+
+  getHeaders(params: UserParams) {
+    return {
+      'rs-uid': params.uid || '',
+      'rs-email': params.email || '',
+      Authorization: 'Bearer ' + params.token,
+    };
+  }
 
   async simpleRequest<TRequestData = undefined>(url: string, params: RequestParams<TRequestData>): Promise<void> {
     const response = await this.request<TRequestData>(url, params);

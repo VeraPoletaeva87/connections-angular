@@ -11,6 +11,7 @@ import * as MessagesActions from '../../../redux/actions/messages.actions';
 import { HTTPClientService } from 'src/app/core/services/http.service';
 import { UtilsService } from '../../services/utils.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { ThemeService } from 'src/app/core/services/theme.service';
 
 @Component({
   selector: 'app-conversation',
@@ -35,10 +36,16 @@ export class ConversationComponent {
   get updateDisabled() {
     return this.countdownService.isRunning;
   }
+
+  isDarkTheme$ = this.themeService.isDarkTheme$;
+  get isLight() {
+    return !this.themeService.isDark;
+  }
   
   constructor(
     private loginService: LoginService,
     private countdownService: CountdownService,
+    private themeService: ThemeService,
     private httpService: HTTPClientService,
     private toastService: ToastService,
     private router: Router,
@@ -51,14 +58,6 @@ export class ConversationComponent {
     this.requestMessages(this.id);
   }
 
-  getHeaders() {
-    return {
-      'rs-uid': this.params.uid || '',
-      'rs-email': this.params.email || '',
-      'Authorization': 'Bearer '+ this.params.token,
-    };
-  }
-
   handleSend(message: string) {  
     const formData = {
       conversationID: this.id,
@@ -66,7 +65,7 @@ export class ConversationComponent {
     }
     this.httpService.simpleRequest('https://tasks.app.rs.school/angular/conversations/append', 
     {
-      headers: this.getHeaders(),
+      headers: this.httpService.getHeaders(this.params),
       method: "POST",
       data: formData 
     }).then(() => {
@@ -88,7 +87,7 @@ export class ConversationComponent {
   handleDeleteConfirmation() {
     this.httpService.simpleRequest(`https://tasks.app.rs.school/angular/conversations/delete?conversationID=${this.id}`, 
     {
-      headers: this.getHeaders(),
+      headers: this.httpService.getHeaders(this.params),
       method: "DELETE"
     }).then(() => {
       this.toastService.showMessage('success', 'Successfuly delete conversation!');
@@ -104,7 +103,7 @@ export class ConversationComponent {
     this.isRequesting = true;
     this.httpService.jsonRequest<MessageResponse>(`https://tasks.app.rs.school/angular/conversations/read?conversationID=${id}`, 
     {
-      headers: this.getHeaders(),
+      headers: this.httpService.getHeaders(this.params),
       method: "GET",
     }).then((data: MessageResponse) => {
       this.toastService.showMessage('success', 'Successfuly got messages!');
