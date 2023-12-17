@@ -79,7 +79,7 @@ export class ListComponent {
     this.showConfirmation = false;
   }
 
-  deleteHandler(id: string) {
+  deleteHandler(event: Event, id: string) {
     this.showConfirmation = true;
     this.itemToDelete = id;
   }
@@ -134,8 +134,15 @@ export class ListComponent {
       });
   }
 
-  itemClickHandler(item: GroupData) {
-    this.router.navigate([`/group/${item.id.S}`]);
+  itemClickHandler(event: Event, item: GroupData) {
+    const target = event.target as HTMLDivElement;
+    if (target.className === 'delete') {
+      event.preventDefault();
+      event.stopPropagation();
+    } else {
+      this.router.navigate([`/group/${item.id.S}`]);
+    }
+    
   }
 
   ngOnInit() {

@@ -124,14 +124,10 @@ export class GroupComponent {
         this.toastService.showMessage('success', 'Successfuly got messages!');
         this.items = data.Items;
         this.formattedItems =
-          this.utilsService.formatItems(this.items, this.params.uid || '') ||
-          [];
-        this.store.dispatch(
-          MessagesActions.AddMessages({
-            id: this.id,
-            items: this.formattedItems,
-          })
-        );
+        this.utilsService.formatItems(this.items, this.params.uid || '') || [];
+        if (this.formattedItems.length) {
+          this.store.dispatch(MessagesActions.AddMessages({id: this.id, items: this.formattedItems}));
+        }
         this.isRequesting = false;
         this.countdownService.startCountdown();
       })
@@ -156,7 +152,6 @@ export class GroupComponent {
   getMessages(id: string) {
     this.store
       .select(getMessagesById(id))
-      .pipe()
       .subscribe((items: FormattedItem[]) => {
         if (items.length) {
           this.formattedItems = items;
