@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { FormattedItem, MessageData } from 'src/app/shared/types';
-import { tap } from 'rxjs';
+import { BehaviorSubject, tap } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { getPersonByID } from 'src/app/redux/selectors/people.selector';
 import { State } from 'src/app/redux/state.models';
@@ -12,25 +12,8 @@ import { State } from 'src/app/redux/state.models';
 export class UtilsService {
   personName: string = '';
   formattedItems: FormattedItem[] = [];
-  isDarkTheme: boolean = localStorage.getItem('theme') === 'dark';
 
   constructor(private store: Store<State>) {}
-
-  changeTheme() {
-    const theme = localStorage.getItem('theme');
-    if (theme === null) {
-      localStorage.setItem('theme', 'light');
-      this.isDarkTheme = false;
-    } else {
-      if ( theme === 'light' ) {
-        localStorage.setItem('theme', 'dark');
-        this.isDarkTheme = true;
-      } else {
-        localStorage.setItem('theme', 'light');
-        this.isDarkTheme = false;
-      }
-    }
-  }
     
   getFormatted(items: MessageData[], id: string): FormattedItem[] {
     items.forEach(item => {

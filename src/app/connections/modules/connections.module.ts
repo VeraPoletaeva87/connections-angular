@@ -16,6 +16,7 @@ import { GroupComponent } from '../pages/group/group.component';
 import { MessageBlockComponent } from '../components/messagesArea/messages.component';
 import { UtilsService } from '../services/utils.service';
 import CoreModule from 'src/app/core/modules/core.module';
+import { ThemeService } from '../../core/services/theme.service';
 
 @NgModule({
   declarations: [
@@ -26,7 +27,7 @@ import CoreModule from 'src/app/core/modules/core.module';
     ListComponent,
     MainComponent,
     MessageBlockComponent,
-    PeopleListComponent
+    PeopleListComponent,
   ],
   providers: [DatePipe, CountdownService, UtilsService],
   imports: [

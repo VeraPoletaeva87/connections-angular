@@ -1,8 +1,6 @@
 import { Component } from '@angular/core';
-import { Store } from '@ngrx/store';
 import { Router } from '@angular/router';
-import { State } from '../../../redux/state.models';
-import { UtilsService } from '../../services/utils.service';
+import { ThemeService } from '../../../core/services/theme.service';
 
 @Component({
   selector: 'app-main',
@@ -10,15 +8,9 @@ import { UtilsService } from '../../services/utils.service';
   styleUrls: ['./main.component.css'],
 })
 export class MainComponent {
-  get isDarkTheme() {
-    return this.utilsService.isDarkTheme;
-  }
+  isDarkTheme$ = this.themeService.isDarkTheme$;
 
-  themeChangeHandler() {
-    this.utilsService.changeTheme();
-  }
-
-  constructor(private store: Store<State>, private router: Router, private utilsService: UtilsService) {}
+  constructor(private router: Router, private themeService: ThemeService) {}
 
   profileClickHandler() {
     this.router.navigate(['/profile']);

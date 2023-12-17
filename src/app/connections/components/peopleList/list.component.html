@@ -3,7 +3,7 @@
       <app-button class="marginS" (click)="updateHandler()" [disabled]="updateDisabled || isRequesting">Update people list</app-button> 
     </div>
     <div *ngIf="updateDisabled" >You can update people list in: {{countdown$ | async}} seconds</div>
-    <div class="list-block" [class.light-theme-list]="!isDarkTheme" [class.dark-theme-list]="isDarkTheme">
+    <div class="list-block light-theme-list" [class.dark-theme]="isDarkTheme$ | async">
         <div class="list-item" *ngFor="let item of items" (click)="itemClickHandler(item)">
             <div class="{{companionIDs.includes(item.uid.S) ? 'contrast-background' : ''}}">
                 {{ item.name.S }}

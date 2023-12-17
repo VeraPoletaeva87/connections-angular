@@ -6,11 +6,12 @@ import { CommonModule } from '@angular/common';
 import { HTTPClientService } from '../services/http.service';
 import { ToastService } from '../services/toast.service';
 import { ToastComponent } from '../components/toast/toast.component';
+import { HeaderComponent } from '../components/header/header.component';
 
 @NgModule({
-  declarations: [PageNotFoundComponent, ToastComponent],
+  declarations: [PageNotFoundComponent, ToastComponent, HeaderComponent],
   imports: [CommonModule, SharedModule],
   providers: [HTTPClientService, ToastService],
-  exports: [ToastComponent],
+  exports: [ToastComponent, HeaderComponent],
 })
 export default class CoreModule {}
