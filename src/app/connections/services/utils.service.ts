@@ -19,6 +19,7 @@ export class UtilsService {
     items.forEach(item => {
       let newItem ={
         name:'',
+        milliseconds: 0,
         date: '',
         message: ''
       };
@@ -27,7 +28,7 @@ export class UtilsService {
       } else {
         newItem.name = this.personName;
       }
-
+      newItem.milliseconds = +item.createdAt.S;
       newItem.date = new Date(+item.createdAt.S).toLocaleString();
       newItem.message = item.message.S;
       this.formattedItems.push(newItem);
@@ -37,7 +38,7 @@ export class UtilsService {
   }
   
   //change iud to user name or me and format date
-  formatItems(items: MessageData[], id: string) {
+  formatItems(items: MessageData[], id: string): FormattedItem[] {
     const personId = items.filter((item) => item.authorID.S !== id).at(0)?.authorID.S; 
     this.formattedItems = [];
     const sortedItems = items.sort((a, b) => +a.createdAt.S - +b.createdAt.S);

@@ -56,7 +56,12 @@ export class GroupComponent {
   ) {}
 
   updateHandler() {
-    this.requestGroupMessages(this.id);
+    this.requestGroupMessages(this.id, this.getLastMessageTime());
+  }
+
+  getLastMessageTime(): number {
+    const times = this.formattedItems.map((item) => item.milliseconds);
+    return Math.max(...times);
   }
 
   handleSend(message: string) {
@@ -75,7 +80,7 @@ export class GroupComponent {
           'success',
           'Message is successfuly sent!'
         );
-        this.requestGroupMessages(this.id);
+        this.requestGroupMessages(this.id, this.getLastMessageTime());
       })
       .catch((message) => {
         this.toastService.showMessage('error', message);
@@ -110,11 +115,15 @@ export class GroupComponent {
   }
 
   // update groups list from http request
-  requestGroupMessages(id: string) {
+  requestGroupMessages(id: string, since?: number) {
+    let url = `https://tasks.app.rs.school/angular/groups/read?groupID=${id}`;
     this.isRequesting = true;
+    if (since) {
+      url = `https://tasks.app.rs.school/angular/groups/read?groupID=${id}&since=${since}`;
+    }
     this.httpService
       .jsonRequest<MessageResponse>(
-        `https://tasks.app.rs.school/angular/groups/read?groupID=${id}`,
+        url,
         {
           headers: this.httpService.getHeaders(this.params),
           method: 'GET',
@@ -123,10 +132,16 @@ export class GroupComponent {
       .then((data: MessageResponse) => {
         this.toastService.showMessage('success', 'Successfuly got messages!');
         this.items = data.Items;
-        this.formattedItems =
-        this.utilsService.formatItems(this.items, this.params.uid || '') || [];
-        if (this.formattedItems.length) {
-          this.store.dispatch(MessagesActions.AddMessages({id: this.id, items: this.formattedItems}));
+        if (this.items.length) {
+          if (this.formattedItems.length) {
+            const newItems = this.utilsService.formatItems(this.items, this.params.uid || '');
+            const res = this.formattedItems.concat(newItems);
+            this.formattedItems = res;
+            this.store.dispatch(MessagesActions.AddMessages({id: this.id, items: newItems}));
+          } else {
+            this.formattedItems = this.utilsService.formatItems(this.items, this.params.uid || '');
+            this.store.dispatch(MessagesActions.AddMessages({id: this.id, items: this.formattedItems}));
+          }
         }
         this.isRequesting = false;
         this.countdownService.startCountdown();
@@ -158,6 +173,7 @@ export class GroupComponent {
       .subscribe((items: FormattedItem[]) => {
         if (items.length) {
           this.formattedItems = items;
+          this.requestGroupMessages(this.id, this.getLastMessageTime());
         } else {
           this.requestGroupMessages(this.id);
         }

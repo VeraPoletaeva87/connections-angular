@@ -90,6 +90,7 @@ export interface PeopleResponse {
 
 export interface FormattedItem {
   name: string,
+  milliseconds: number,
   date: string,
   message: string
 }
