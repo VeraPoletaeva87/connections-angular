@@ -1,4 +1,4 @@
-import { ConversationData, GroupData, MessageData, PrivateMessages, PeopleInfo, UserData } from "../shared/types";
+import { ConversationData, GroupData, PrivateMessages, PeopleInfo, UserData } from "../shared/types";
 
 export interface State {
       userInfo: UserData,

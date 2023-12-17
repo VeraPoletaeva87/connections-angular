@@ -143,6 +143,9 @@ export class GroupComponent {
         tap((item) => {
           if (item) {
             this.canDelete = item?.createdBy.S === this.params.uid;
+            localStorage.setItem('canDelete', this.canDelete.toString());
+          } else {
+            this.canDelete = localStorage.getItem('canDelete') === 'true';
           }
         })
       )

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { FormattedItem, MessageData } from 'src/app/shared/types';
-import { BehaviorSubject, tap } from 'rxjs';
+import { tap } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { getPersonByID } from 'src/app/redux/selectors/people.selector';
 import { State } from 'src/app/redux/state.models';
