@@ -9,6 +9,7 @@ interface RequestParams<TRequestData = undefined> extends Omit<RequestInit, 'bod
    
 export class HTTPClientService { 
 
+  // returns headers for the fetch request
   getHeaders(params: UserParams) {
     return {
       'rs-uid': params.uid || '',
@@ -17,6 +18,7 @@ export class HTTPClientService {
     };
   }
 
+  // request with no response data needed
   async simpleRequest<TRequestData = undefined>(url: string, params: RequestParams<TRequestData>): Promise<void> {
     const response = await this.request<TRequestData>(url, params);
       if (!response.ok) {
@@ -29,6 +31,7 @@ export class HTTPClientService {
       }
     }  
     
+  // request with response data  
   async jsonRequest<TResponseData, TRequestData = undefined>(url: string, params: RequestParams<TRequestData>): Promise<TResponseData> {
     const response = await this.request<TRequestData>(url, params);
     if (response.ok) {
@@ -48,6 +51,7 @@ export class HTTPClientService {
     }
   }
 
+  // common request function
   private async request<TRequestData = undefined>(url: string, params: RequestParams<TRequestData>): Promise<Response> {
     const { data, method = 'GET', headers = {}, ...restParams } = params;
     return fetch(url, 

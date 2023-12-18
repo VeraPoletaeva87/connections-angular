@@ -19,6 +19,7 @@ export class UtilsService {
 
   constructor(private store: Store<State>) {}
 
+  // returns messages in a readable format
   getFormatted(items: MessageData[], id: string): FormattedItem[] {
     items.forEach((item) => {
       let newItem = {
@@ -68,11 +69,13 @@ export class UtilsService {
     return this.formattedItems;
   }
 
+  // returns time of the last message in milliseconds
   getLastMessageTime(items: FormattedItem[]): number {
     const times = items.map((item) => item.milliseconds);
     return Math.max(...times);
   }
 
+  // format and add new items to list and to store or save all items if store is empty
   setNewItems(
     data: MessageResponse,
     formatted: FormattedItem[],

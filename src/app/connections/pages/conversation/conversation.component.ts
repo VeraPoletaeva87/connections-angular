@@ -7,7 +7,6 @@ import { CountdownService } from '../../services/countdown.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { tap } from 'rxjs';
 import { getMessagesById } from 'src/app/redux/selectors/messages.selectors';
-import * as MessagesActions from '../../../redux/actions/messages.actions';
 import { HTTPClientService } from 'src/app/core/services/http.service';
 import { UtilsService } from '../../services/utils.service';
 import { ToastService } from '../../../core/services/toast.service';
@@ -54,10 +53,12 @@ export class ConversationComponent {
     private route: ActivatedRoute
   ) {}
 
+  // get only new messages if update on button on conversation page
   updateHandler() {
     this.requestMessages(this.id, this.utilsService.getLastMessageTime(this.formattedItems));
   }
 
+  // get only new messages after sending
   handleSend(message: string) {  
     const formData = {
       conversationID: this.id,
@@ -84,6 +85,7 @@ export class ConversationComponent {
     this.showConfirmation = true;
   }
   
+  // delete conversation and redirect to main page
   handleDeleteConfirmation() {
     this.httpService.simpleRequest(`https://tasks.app.rs.school/angular/conversations/delete?conversationID=${this.id}`, 
     {
@@ -98,7 +100,7 @@ export class ConversationComponent {
     });
   }
   
-    // update groups list from http request
+  // update groups list from http request
   requestMessages(id: string, since?: number) {
     this.isRequesting = true;
     let url = `https://tasks.app.rs.school/angular/conversations/read?conversationID=${id}`;
@@ -120,6 +122,7 @@ export class ConversationComponent {
     });
   }
 
+  // save new or all messages depending on stored items
   getMessages(id: string) {
     this.store.select(getMessagesById(id)).pipe().
     subscribe((items: FormattedItem[]) => {

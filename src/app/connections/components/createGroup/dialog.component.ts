@@ -51,6 +51,7 @@ export class DialogComponent {
     this.submitDisabled = this.createGroupForm.invalid;
   }
 
+  // save new group and add it to store
   submitHandler() {
     if (!this.createGroupForm.invalid) {
       const formData = {

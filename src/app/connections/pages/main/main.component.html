@@ -1,11 +1,13 @@
 <div class="flex" [class.dark-theme]="isDarkTheme$ | async">
-    <div class="list-block paddingL">
-        <div>Groups list</div>
-        <app-list></app-list>
-    </div>
-    <div class="list-block paddingL">
-        <div>People</div>
-        <app-peoplelist></app-peoplelist>
-    </div>
-    <app-button class="paddingL" (click)="profileClickHandler()">Profile</app-button>
+  <div class="list-block paddingL">
+    <div>Groups list</div>
+    <app-list></app-list>
+  </div>
+  <div class="list-block paddingL">
+    <div>People</div>
+    <app-peoplelist></app-peoplelist>
+  </div>
+  <app-button class="paddingL" (click)="profileClickHandler()"
+    >Profile</app-button
+  >
 </div>

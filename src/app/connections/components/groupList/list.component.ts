@@ -84,6 +84,7 @@ export class ListComponent {
     this.itemToDelete = id;
   }
 
+  // delete group from store
   handleDeleteConfirmation() {
     const params = this.loginService.getUser();
 
@@ -134,6 +135,7 @@ export class ListComponent {
       });
   }
 
+  // click on group redirects to group conversation
   itemClickHandler(event: Event, item: GroupData) {
     const target = event.target as HTMLDivElement;
     if (target.className === 'delete') {

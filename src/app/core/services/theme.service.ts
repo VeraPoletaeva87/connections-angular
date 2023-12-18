@@ -11,6 +11,7 @@ export class ThemeService {
   isDarkTheme$ = this.darkThemeSubject.asObservable();
   isDark: boolean = localStorage.getItem('theme') === 'dark';
 
+  // saves current theme in local storage on change
   changeTheme() {
     const current = this.darkThemeSubject.value;
     if (current == true) {

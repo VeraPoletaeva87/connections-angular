@@ -7,6 +7,7 @@ export class CountdownService {
   countdown$ = this.countdownSubject.asObservable();
   isRunning = false;
 
+  // starts countdown for 60 seconds and resets at the end
   startCountdown() {
     if (!this.isRunning) {
       this.isRunning = true;

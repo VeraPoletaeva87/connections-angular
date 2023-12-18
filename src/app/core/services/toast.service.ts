@@ -13,6 +13,7 @@ export class ToastService {
   show$: Observable<boolean> = this.showSubject.asObservable();
   mode$: Observable<string> = this.modeSubject.asObservable();
 
+  // shows message block in error or success mode and with a given message
   showMessage(mode: string, message: string) {
     this.messageSubject.next(message);
     this.modeSubject.next(mode);

@@ -34,7 +34,7 @@ export class GroupComponent {
   };
 
   countdown$ = this.countdownService.countdown$;
-  
+
   get updateDisabled() {
     return this.countdownService.isRunning;
   }
@@ -61,6 +61,7 @@ export class GroupComponent {
     this.requestGroupMessages(this.id, this.utilsService.getLastMessageTime(this.formattedItems));
   }
 
+  // update messages list after sending, get only new messages
   handleSend(message: string) {
     const formData = {
       groupID: this.id,
@@ -114,7 +115,7 @@ export class GroupComponent {
       });
   }
 
-  // update groups list from http request
+  // get groups list from http request
   requestGroupMessages(id: string, since?: number) {
     let url = `https://tasks.app.rs.school/angular/groups/read?groupID=${id}`;
     this.isRequesting = true;
@@ -140,6 +141,7 @@ export class GroupComponent {
       });
   }
 
+  // show delete button only for group owner
   setCanDelete() {
     this.store
       .select(getGroupById(this.id))
@@ -156,6 +158,7 @@ export class GroupComponent {
       .subscribe();
   }
 
+  // if store is not empty - add only new messages
   getMessages(id: string) {
     this.store
       .select(getMessagesById(id))
@@ -169,6 +172,7 @@ export class GroupComponent {
       });
   }
 
+  // get group id from route params
   ngOnInit() {
     this.params = this.loginService.getUser();
     return this.route.paramMap
