@@ -63,7 +63,7 @@
         {{password?.errors?.['passwordStrength']}}
       </div>
     </div>
-    <app-button class="login-button" [disabled]="submitDisabled"
+    <app-button class="login-button" [disabled]="submitDisabled" (click)="loginHandler()"
       >Register</app-button
     >
   </form>

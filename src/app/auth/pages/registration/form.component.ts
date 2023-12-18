@@ -53,9 +53,15 @@ export class RegisterPageComponent {
        }
      )
      .then(() => {
-       this.toastService.showMessage('success', 'User is successfuly registered!');
+       this.toastService.showMessage(
+        'success',
+        'User is successfuly registered!'
+       );
        this.submitDisabled = false;
-       this.router.navigate(['/signin']);
+       setTimeout(() => {
+        this.router.navigate(['/signin']);
+      }, 3000);
+       
      })
      .catch((message) => {
        this.toastService.showMessage('error', message);
