@@ -18,6 +18,7 @@ import { ToastService } from '../../../core/services/toast.service';
 import { ThemeService } from '../../../core/services/theme.service';
 import { HTTPClientService } from 'src/app/core/services/http.service';
 import { getConversations } from 'src/app/redux/selectors/conversation.selector';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-peoplelist',
@@ -35,6 +36,9 @@ export class PeopleListComponent {
     email: '',
     token: '',
   };
+
+  conversationSubscription: Subscription = new Subscription;
+  peopleSubscription: Subscription = new Subscription;
 
   countdown$ = this.countdownService.countdown$;
   get updateDisabled() {
@@ -58,12 +62,15 @@ export class PeopleListComponent {
 
   updateHandler() {
     this.requestPeople();
+    this.requestConversations();
   }
 
   itemClickHandler(item: PeopleInfo) {
     // create conversation if there is no one and redirect to conversation
     if (this.companionIDs.includes(item.uid.S)) {
-      this.router.navigate([`/conversation/${item.uid.S}`]);
+      const conversation = this.conversationItems.filter((el) => el.companionID.S === item.uid.S);
+      const conversationId = conversation.at(0)?.id.S;
+      this.router.navigate([`/conversation/${conversationId}`]);
     } else {
       const formData = {
         companion: item.uid.S,
@@ -100,15 +107,6 @@ export class PeopleListComponent {
     }
   }
 
-  // update people list from store
-  updatePeopleFromStore() {
-    return this.store
-      .pipe(select((state) => getPeople(state)))
-      .subscribe((items: PeopleInfo[]) => {
-        this.items = items;
-      });
-  }
-
   // update people list from http request
   requestPeople() {
     this.isRequesting = true;
@@ -124,7 +122,6 @@ export class PeopleListComponent {
       this.toastService.showMessage('success', 'Successfuly got people list!');
       this.items = data.Items.filter((item: PeopleInfo) => item.uid.S !== this.params.uid);
       this.store.dispatch(PeopleActions.AddPeople({ items: this.items }));
-      this.requestConversations();
       this.isRequesting = false;
       this.countdownService.startCountdown();
     })
@@ -144,8 +141,10 @@ export class PeopleListComponent {
     )
     .then((data: ConversationResponse) => {
       this.conversationItems = data.Items;
-      this.companionIDs = this.conversationItems.map((item) => item.companionID.S);
-      this.store.dispatch(ConversationActions.AddConversations({items: this.conversationItems}));
+      if (this.conversationItems.length) {
+        this.companionIDs = this.conversationItems.map((item) => item.companionID.S);
+        this.store.dispatch(ConversationActions.AddConversations({items: this.conversationItems}));
+      }
     })
     .catch((message) => {
       this.toastService.showMessage('error', message);
@@ -153,7 +152,7 @@ export class PeopleListComponent {
   }
 
   getConversations() {
-    return this.store
+    this.conversationSubscription = this.store
       .select((state) => getConversations(state))
       .subscribe((items: ConversationData[]) => {
         if (items.length) {
@@ -167,7 +166,7 @@ export class PeopleListComponent {
 
   ngOnInit() {
     this.params = this.loginService.getUser();
-    return this.store
+    this.peopleSubscription = this.store
       .pipe(select((state) => getPeople(state)))
       .subscribe((items: PeopleInfo[]) => {
         if (items.length) {
@@ -178,4 +177,10 @@ export class PeopleListComponent {
         this.getConversations();
       });
   }
+
+
+  ngOnDestroy(){
+    this.conversationSubscription.unsubscribe();
+    this.peopleSubscription.unsubscribe();
+  }  
 }

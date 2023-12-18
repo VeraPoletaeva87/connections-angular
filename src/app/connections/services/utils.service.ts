@@ -21,7 +21,8 @@ export class UtilsService {
 
   // returns messages in a readable format
   getFormatted(items: MessageData[], id: string): FormattedItem[] {
-    items.forEach((item) => {
+    if (items.length) {
+      items.forEach((item) => {
       let newItem = {
         name: '',
         milliseconds: 0,
@@ -31,46 +32,31 @@ export class UtilsService {
       if (item.authorID.S === id) {
         newItem.name = 'Me';
       } else {
-        newItem.name = this.personName;
+        newItem.name = 'user';
       }
       newItem.milliseconds = +item.createdAt.S;
       newItem.date = new Date(+item.createdAt.S).toLocaleString();
       newItem.message = item.message.S;
       this.formattedItems.push(newItem);
     });
+    }
 
     return this.formattedItems;
   }
 
   //change iud to user name or me and format date
   formatItems(items: MessageData[], id: string): FormattedItem[] {
-    const personId = items.filter((item) => item.authorID.S !== id).at(0)
-      ?.authorID.S;
+    const personId = items.filter((item) => item.authorID.S !== id).at(0)?.authorID.S;
     this.formattedItems = [];
     const sortedItems = items.sort((a, b) => +a.createdAt.S - +b.createdAt.S);
-    // if not only mine messages
-    if (personId) {
-      this.store
-        .select(getPersonByID(personId))
-        .pipe(
-          tap((item) => {
-            if (item) {
-              this.personName = item?.name.S;
-            } else {
-              this.personName = 'user';
-            }
-            return this.getFormatted(sortedItems, id);
-          })
-        )
-        .subscribe();
-    } else {
-      return this.getFormatted(sortedItems, id);
-    }
-    return this.formattedItems;
+    return this.getFormatted(sortedItems, id);
   }
 
   // returns time of the last message in milliseconds
   getLastMessageTime(items: FormattedItem[]): number {
+    if (!items.length) {
+      return new Date().getTime();
+    }
     const times = items.map((item) => item.milliseconds);
     return Math.max(...times);
   }

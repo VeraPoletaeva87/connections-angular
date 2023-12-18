@@ -5,11 +5,12 @@ import { LoginPageComponent } from './auth/pages/signin-page/form.component';
 import { ProfileComponent } from './auth/pages/profile/profile.component';
 import { ConversationComponent } from './connections/pages/conversation/conversation.component';
 import { GroupComponent } from './connections/pages/group/group.component';
+import { authGuard } from './connections/guards/auth.guard';
 
 const routes: Routes = [
   { path: '', redirectTo: '/signup', pathMatch: 'full' },
-  { path: 'conversation/:id', component: ConversationComponent },
-  { path: 'group/:id', component: GroupComponent },
+  { path: 'conversation/:id', component: ConversationComponent, canActivate: [authGuard] },
+  { path: 'group/:id', component: GroupComponent, canActivate: [authGuard] },
   {
     path: 'signup',
     loadChildren: () =>

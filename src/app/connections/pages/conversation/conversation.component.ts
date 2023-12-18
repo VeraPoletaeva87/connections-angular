@@ -5,10 +5,11 @@ import { LoginService } from 'src/app/auth/services/login.service';
 import { FormattedItem, MessageData, MessageResponse, UserParams } from 'src/app/shared/types';
 import { CountdownService } from '../../services/countdown.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { tap } from 'rxjs';
+import { Subscription, tap } from 'rxjs';
 import { getMessagesById } from 'src/app/redux/selectors/messages.selectors';
 import { HTTPClientService } from 'src/app/core/services/http.service';
 import { UtilsService } from '../../services/utils.service';
+import * as ConversationActions from '../../../redux/actions/conversation.actions';
 import { ToastService } from '../../../core/services/toast.service';
 import { ThemeService } from 'src/app/core/services/theme.service';
 
@@ -22,6 +23,7 @@ export class ConversationComponent {
   personName: string = '';
   items: MessageData[] = []; 
   id: string = '';
+  messageTime: number = 0;
   showConfirmation: boolean = false;
   formattedItems: FormattedItem[] =[];
   isRequesting: boolean = false;
@@ -30,6 +32,8 @@ export class ConversationComponent {
     email: '',
     token: ''
   };
+
+  messagesSubscription: Subscription = new Subscription;
   
   countdown$ = this.countdownService.countdown$;
   get updateDisabled() {
@@ -60,6 +64,8 @@ export class ConversationComponent {
 
   // get only new messages after sending
   handleSend(message: string) {  
+    // save send message time in case it is first message in conversation
+    this.messageTime = new Date().getTime();
     const formData = {
       conversationID: this.id,
       message: message,
@@ -71,7 +77,13 @@ export class ConversationComponent {
       data: formData 
     }).then(() => {
       this.toastService.showMessage('success', 'Message is successfuly sent!');
-      this.requestMessages(this.id, this.utilsService.getLastMessageTime(this.formattedItems));
+      let since;
+      if (this.formattedItems.length) {
+        since = this.utilsService.getLastMessageTime(this.formattedItems);
+      } else {
+        since = this.messageTime;
+      }
+      this.requestMessages(this.id, since);
     }).catch((message) => {
       this.toastService.showMessage('error', message);
     });
@@ -94,6 +106,8 @@ export class ConversationComponent {
     }).then(() => {
       this.toastService.showMessage('success', 'Successfuly delete conversation!');
       this.showConfirmation = false;
+      // delete current conversation from store to update list highlight on main page
+      this.store.dispatch(ConversationActions.DeleteConversation({ id: this.id }));
       this.router.navigate(['/main']);
     }).catch((message) => {
       this.toastService.showMessage('error', message);
@@ -104,7 +118,6 @@ export class ConversationComponent {
   requestMessages(id: string, since?: number) {
     this.isRequesting = true;
     let url = `https://tasks.app.rs.school/angular/conversations/read?conversationID=${id}`;
-    this.isRequesting = true;
     if (since) {
       url = `https://tasks.app.rs.school/angular/conversations/read?conversationID=${id}&since=${since}`;
     }
@@ -124,7 +137,7 @@ export class ConversationComponent {
 
   // save new or all messages depending on stored items
   getMessages(id: string) {
-    this.store.select(getMessagesById(id)).pipe().
+    this.messagesSubscription = this.store.select(getMessagesById(id)).pipe().
     subscribe((items: FormattedItem[]) => {
       if (items.length) {
         this.formattedItems = items;
@@ -143,4 +156,8 @@ export class ConversationComponent {
         this.getMessages(this.id);
       })).subscribe();
   }
+
+  ngOnDestroy(){
+    this.messagesSubscription.unsubscribe();
+  }  
 }

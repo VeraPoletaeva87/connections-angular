@@ -10,6 +10,7 @@ import { Router } from '@angular/router';
 import { ToastService } from '../../../core/services/toast.service';
 import { ThemeService } from '../../../core/services/theme.service';
 import { HTTPClientService } from 'src/app/core/services/http.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-list',
@@ -29,6 +30,8 @@ export class ListComponent {
     email: '',
     token: '',
   };
+
+  groupSubscription: Subscription = new Subscription;
 
   countdown$ = this.countdownService.countdown$;
   get updateDisabled() {
@@ -148,7 +151,7 @@ export class ListComponent {
 
   ngOnInit() {
     this.params = this.loginService.getUser();
-    return this.store
+    this.groupSubscription = this.store
       .pipe(select((state) => getGroups(state)))
       .subscribe((items: GroupData[]) => {
         if (items.length) {
@@ -158,4 +161,8 @@ export class ListComponent {
         }
       });
   }
+
+  ngOnDestroy(){
+    this.groupSubscription.unsubscribe();
+  }  
 }

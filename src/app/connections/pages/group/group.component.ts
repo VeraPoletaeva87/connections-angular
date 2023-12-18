@@ -6,7 +6,7 @@ import { getGroupById } from 'src/app/redux/selectors/groups.selector';
 import { FormattedItem, MessageData, MessageResponse, UserParams } from 'src/app/shared/types';
 import { CountdownService } from '../../services/countdown.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { tap } from 'rxjs';
+import { Subscription, tap } from 'rxjs';
 import { getMessagesById } from 'src/app/redux/selectors/messages.selectors';
 import { UtilsService } from '../../services/utils.service';
 import { HTTPClientService } from 'src/app/core/services/http.service';
@@ -21,6 +21,7 @@ import { ThemeService } from '../../../core/services/theme.service';
   providers: [CountdownService]
 })
 export class GroupComponent {
+  messageTime: number = 0;
   items: MessageData[] = [];
   id: string = '';
   showConfirmation: boolean = false;
@@ -32,6 +33,9 @@ export class GroupComponent {
       email: '',
     token: '',
   };
+
+  messagesSubscription: Subscription = new Subscription;
+  canDeleteSubscription: Subscription = new Subscription;
 
   countdown$ = this.countdownService.countdown$;
 
@@ -63,6 +67,8 @@ export class GroupComponent {
 
   // update messages list after sending, get only new messages
   handleSend(message: string) {
+    // save send message time in case it is first message in conversation
+    this.messageTime = new Date().getTime();
     const formData = {
       groupID: this.id,
       message: message,
@@ -74,11 +80,14 @@ export class GroupComponent {
         data: formData,
       })
       .then(() => {
-        this.toastService.showMessage(
-          'success',
-          'Message is successfuly sent!'
-        );
-        this.requestGroupMessages(this.id, this.utilsService.getLastMessageTime(this.formattedItems));
+        this.toastService.showMessage('success', 'Message is successfuly sent!');
+        let since;
+        if (this.formattedItems.length) {
+          since = this.utilsService.getLastMessageTime(this.formattedItems);
+        } else {
+          since = this.messageTime;
+        }
+        this.requestGroupMessages(this.id, since);
       })
       .catch((message) => {
         this.toastService.showMessage('error', message);
@@ -143,7 +152,7 @@ export class GroupComponent {
 
   // show delete button only for group owner
   setCanDelete() {
-    this.store
+    this.canDeleteSubscription = this.store
       .select(getGroupById(this.id))
       .pipe(
         tap((item) => {
@@ -160,7 +169,7 @@ export class GroupComponent {
 
   // if store is not empty - add only new messages
   getMessages(id: string) {
-    this.store
+     this.messagesSubscription = this.store
       .select(getMessagesById(id))
       .subscribe((items: FormattedItem[]) => {
         if (items.length) {
@@ -185,4 +194,9 @@ export class GroupComponent {
       )
       .subscribe();
   }
+   
+   ngOnDestroy(){
+     this.messagesSubscription.unsubscribe();
+     this.canDeleteSubscription.unsubscribe();
+   }
 }
