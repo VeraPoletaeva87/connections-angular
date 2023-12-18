@@ -55,7 +55,7 @@ export class ConversationComponent {
   ) {}
 
   updateHandler() {
-    this.requestMessages(this.id);
+    this.requestMessages(this.id, this.utilsService.getLastMessageTime(this.formattedItems));
   }
 
   handleSend(message: string) {  
@@ -70,7 +70,7 @@ export class ConversationComponent {
       data: formData 
     }).then(() => {
       this.toastService.showMessage('success', 'Message is successfuly sent!');
-      this.requestMessages(this.id);
+      this.requestMessages(this.id, this.utilsService.getLastMessageTime(this.formattedItems));
     }).catch((message) => {
       this.toastService.showMessage('error', message);
     });
@@ -99,19 +99,20 @@ export class ConversationComponent {
   }
   
     // update groups list from http request
-  requestMessages(id: string) {
+  requestMessages(id: string, since?: number) {
     this.isRequesting = true;
-    this.httpService.jsonRequest<MessageResponse>(`https://tasks.app.rs.school/angular/conversations/read?conversationID=${id}`, 
+    let url = `https://tasks.app.rs.school/angular/conversations/read?conversationID=${id}`;
+    this.isRequesting = true;
+    if (since) {
+      url = `https://tasks.app.rs.school/angular/conversations/read?conversationID=${id}&since=${since}`;
+    }
+    this.httpService.jsonRequest<MessageResponse>(url, 
     {
       headers: this.httpService.getHeaders(this.params),
       method: "GET",
     }).then((data: MessageResponse) => {
       this.toastService.showMessage('success', 'Successfuly got messages!');
-      this.items = data?.Items;
-      if (this.items.length) {
-        this.formattedItems = this.utilsService.formatItems(this.items, this.params.uid || '') || [];
-        this.store.dispatch(MessagesActions.AddMessages({ id: this.id, items: this.formattedItems }));
-      }
+      this.formattedItems = this.utilsService.setNewItems(data, this.formattedItems, this.params.uid || '', this.id);
       this.isRequesting = false;
       this.countdownService.startCountdown();
     }).catch((message) => {
@@ -124,6 +125,7 @@ export class ConversationComponent {
     subscribe((items: FormattedItem[]) => {
       if (items.length) {
         this.formattedItems = items;
+        this.requestMessages(this.id, this.utilsService.getLastMessageTime(this.formattedItems));
       } else {
         this.requestMessages(this.id);
       }

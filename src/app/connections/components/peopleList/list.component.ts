@@ -123,7 +123,7 @@ export class PeopleListComponent {
       this.toastService.showMessage('success', 'Successfuly got people list!');
       this.items = data.Items.filter((item: PeopleInfo) => item.uid.S !== this.params.uid);
       this.store.dispatch(PeopleActions.AddPeople({ items: this.items }));
-      // this.requestConversations();
+      this.requestConversations();
       this.isRequesting = false;
       this.countdownService.startCountdown();
     })

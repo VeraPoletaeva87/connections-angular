@@ -56,12 +56,7 @@ export class GroupComponent {
   ) {}
 
   updateHandler() {
-    this.requestGroupMessages(this.id, this.getLastMessageTime());
-  }
-
-  getLastMessageTime(): number {
-    const times = this.formattedItems.map((item) => item.milliseconds);
-    return Math.max(...times);
+    this.requestGroupMessages(this.id, this.utilsService.getLastMessageTime(this.formattedItems));
   }
 
   handleSend(message: string) {
@@ -80,7 +75,7 @@ export class GroupComponent {
           'success',
           'Message is successfuly sent!'
         );
-        this.requestGroupMessages(this.id, this.getLastMessageTime());
+        this.requestGroupMessages(this.id, this.utilsService.getLastMessageTime(this.formattedItems));
       })
       .catch((message) => {
         this.toastService.showMessage('error', message);
@@ -131,18 +126,7 @@ export class GroupComponent {
       )
       .then((data: MessageResponse) => {
         this.toastService.showMessage('success', 'Successfuly got messages!');
-        this.items = data.Items;
-        if (this.items.length) {
-          if (this.formattedItems.length) {
-            const newItems = this.utilsService.formatItems(this.items, this.params.uid || '');
-            const res = this.formattedItems.concat(newItems);
-            this.formattedItems = res;
-            this.store.dispatch(MessagesActions.AddMessages({id: this.id, items: newItems}));
-          } else {
-            this.formattedItems = this.utilsService.formatItems(this.items, this.params.uid || '');
-            this.store.dispatch(MessagesActions.AddMessages({id: this.id, items: this.formattedItems}));
-          }
-        }
+        this.formattedItems = this.utilsService.setNewItems(data, this.formattedItems, this.params.uid || '', this.id);
         this.isRequesting = false;
         this.countdownService.startCountdown();
       })
@@ -173,7 +157,7 @@ export class GroupComponent {
       .subscribe((items: FormattedItem[]) => {
         if (items.length) {
           this.formattedItems = items;
-          this.requestGroupMessages(this.id, this.getLastMessageTime());
+          this.requestGroupMessages(this.id, this.utilsService.getLastMessageTime(this.formattedItems));
         } else {
           this.requestGroupMessages(this.id);
         }
