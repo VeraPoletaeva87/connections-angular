@@ -1,36 +1,28 @@
-.flex {
-    display: flex;
-}
-
-.baseline {
-    justify-content: baseline;
-}
-
 .list-block {
-    width: 250px;
-    padding: 12px;
-    max-height: 600px;
-    overflow: scroll;
+  width: 250px;
+  padding: 12px;
+  max-height: 600px;
+  overflow: scroll;
 }
 
 .list-item {
-    line-height: 20px;
+  line-height: 20px;
 }
 
 .list-item:hover {
-    cursor: pointer;
-    text-decoration: underline;
-    color: rgb(50, 50, 119);
+  cursor: pointer;
+  text-decoration: underline;
+  color: rgb(50, 50, 119);
 }
 
 .marginS {
-    margin-right: 12px;
-    margin-bottom: 12px;
+  margin-right: 12px;
+  margin-bottom: 12px;
 }
 
 .delete {
-    color: #aaaaaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
+  color: #aaaaaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
 }

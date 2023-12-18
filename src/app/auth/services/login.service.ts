@@ -3,49 +3,50 @@ import { Router } from '@angular/router';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
-
 export class LoginService {
-    //loggedIn = false - user is not logged in
-    loggedIn: boolean = false;
-    private valueObs: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  // loggedIn = false - user is not logged in
+  loggedIn: boolean = false;
+  private valueObs: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(
+    false
+  );
 
-    constructor(private router: Router) {}
+  constructor(private router: Router) {}
 
-    setValue(value: boolean): void {
-        this.valueObs.next(value);
-      }
-      
-    getValue(): Observable<boolean> {
-        return this.valueObs.asObservable();
-    }
+  setValue(value: boolean): void {
+    this.valueObs.next(value);
+  }
 
-    saveUser(email: string, token: string, uid: string) {
-        localStorage.setItem('email', email);
-        localStorage.setItem('token', token);
-        localStorage.setItem('uid', uid);
-        this.setValue(true);
-    }
+  getValue(): Observable<boolean> {
+    return this.valueObs.asObservable();
+  }
 
-    getUser() {
-        this.setValue(true);
-        return {
-            email: localStorage.getItem('email'),
-            token: localStorage.getItem('token'),
-            uid: localStorage.getItem('uid')
-        };
-    }
+  saveUser(email: string, token: string, uid: string) {
+    localStorage.setItem('email', email);
+    localStorage.setItem('token', token);
+    localStorage.setItem('uid', uid);
+    this.setValue(true);
+  }
 
-    logOut() {
-        this.setValue(false);
-        localStorage.clear();
-        this.router.navigate(['/signin']);
-    }
+  getUser() {
+    this.setValue(true);
+    return {
+      email: localStorage.getItem('email'),
+      token: localStorage.getItem('token'),
+      uid: localStorage.getItem('uid'),
+    };
+  }
 
-    isLoggedIn() {
-        return !!localStorage.getItem('email');
-    } 
+  logOut() {
+    this.setValue(false);
+    localStorage.clear();
+    this.router.navigate(['/signin']);
+  }
 
-    updateLogged() {
-        this.setValue(!!localStorage.getItem('email'));
-    }
+  isLoggedIn() {
+    return !!localStorage.getItem('email');
+  }
+
+  updateLogged() {
+    this.setValue(!!localStorage.getItem('email'));
+  }
 }

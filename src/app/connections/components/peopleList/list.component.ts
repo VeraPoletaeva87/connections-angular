@@ -17,6 +17,7 @@ import { Router } from '@angular/router';
 import { ToastService } from '../../../core/services/toast.service';
 import { ThemeService } from '../../../core/services/theme.service';
 import { HTTPClientService } from 'src/app/core/services/http.service';
+import { getConversations } from 'src/app/redux/selectors/conversation.selector';
 
 @Component({
   selector: 'app-peoplelist',
@@ -143,18 +144,25 @@ export class PeopleListComponent {
     )
     .then((data: ConversationResponse) => {
       this.conversationItems = data.Items;
-      this.companionIDs = this.conversationItems.map(
-        (item) => item.companionID.S
-      );
-      this.store.dispatch(
-        ConversationActions.AddConversations({
-          items: this.conversationItems,
-        })
-      );
+      this.companionIDs = this.conversationItems.map((item) => item.companionID.S);
+      this.store.dispatch(ConversationActions.AddConversations({items: this.conversationItems}));
     })
     .catch((message) => {
       this.toastService.showMessage('error', message);
     });
+  }
+
+  getConversations() {
+    return this.store
+      .select((state) => getConversations(state))
+      .subscribe((items: ConversationData[]) => {
+        if (items.length) {
+          this.conversationItems = items;
+          this.companionIDs = this.conversationItems.map((item) => item.companionID.S);
+        } else {
+          this.requestConversations();
+        }
+      });
   }
 
   ngOnInit() {
@@ -167,6 +175,7 @@ export class PeopleListComponent {
         } else {
           this.requestPeople();
         }
+        this.getConversations();
       });
   }
 }

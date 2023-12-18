@@ -142,7 +142,6 @@ export class ListComponent {
     } else {
       this.router.navigate([`/group/${item.id.S}`]);
     }
-    
   }
 
   ngOnInit() {

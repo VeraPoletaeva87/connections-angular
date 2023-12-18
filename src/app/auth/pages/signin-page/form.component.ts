@@ -1,6 +1,11 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { AbstractControl, FormControl, NonNullableFormBuilder, Validators } from '@angular/forms';
+import {
+  AbstractControl,
+  FormControl,
+  NonNullableFormBuilder,
+  Validators,
+} from '@angular/forms';
 import { LoginService } from '../../services/login.service';
 import { ToastService } from '../../../core/services/toast.service';
 
@@ -11,7 +16,7 @@ import { ToastService } from '../../../core/services/toast.service';
 })
 export class LoginPageComponent {
   constructor(
-    private loginService: LoginService, 
+    private loginService: LoginService,
     private router: Router,
     private toastService: ToastService,
     private formBuilder: NonNullableFormBuilder
@@ -21,11 +26,15 @@ export class LoginPageComponent {
 
   loginForm = this.formBuilder.group({
     login: new FormControl('', [Validators.required, Validators.email]),
-    password: new FormControl('', [Validators.required])
+    password: new FormControl('', [Validators.required]),
   });
 
-  get login(): AbstractControl<string | null> | null { return this.loginForm.get('login'); }
-  get password(): AbstractControl<string | null> | null { return this.loginForm.get('password'); }
+  get login(): AbstractControl<string | null> | null {
+    return this.loginForm.get('login');
+  }
+  get password(): AbstractControl<string | null> | null {
+    return this.loginForm.get('password');
+  }
 
   inputChangeHandler() {
     this.submitDisabled = this.loginForm.invalid;
@@ -33,41 +42,50 @@ export class LoginPageComponent {
 
   loginHandler() {
     if (!this.loginForm.invalid) {
-     const formData = {
-      email: this.loginForm.controls.login.value,
-      password: this.loginForm.controls.password.value
-     }
-     this.submitDisabled = true;
-     fetch('https://tasks.app.rs.school/angular/login', 
-      {
+      const formData = {
+        email: this.loginForm.controls.login.value,
+        password: this.loginForm.controls.password.value,
+      };
+      this.submitDisabled = true;
+      fetch('https://tasks.app.rs.school/angular/login', {
         headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
         },
-        method: "POST",
-        body: JSON.stringify(formData)
-    }).then(response => {
-      if (!response.ok) {
-         response.json()
-              .catch(() => {
-                  throw new Error('Could not parse the JSON');
-              })
-              .then(({type, message}) => {
-                if (type='NotFoundException') {
-                  this.submitDisabled = true;
-                }
-                this.toastService.showMessage('error', message);
-              });
-      } else {
-        response.clone().json()
-          .then((data) => {
-            this.toastService.showMessage('success', 'User successfuly logged in!');
-            this.submitDisabled = false;
-            this.loginService.saveUser(this.loginForm.controls.login.value || '', data.token, data.uid);
-            this.router.navigate(['/main']);
-          });
-      }
-  });
+        method: 'POST',
+        body: JSON.stringify(formData),
+      }).then((response) => {
+        if (!response.ok) {
+          response
+            .json()
+            .catch(() => {
+              throw new Error('Could not parse the JSON');
+            })
+            .then(({ type, message }) => {
+              if ((type = 'NotFoundException')) {
+                this.submitDisabled = true;
+              }
+              this.toastService.showMessage('error', message);
+            });
+        } else {
+          response
+            .clone()
+            .json()
+            .then((data) => {
+              this.toastService.showMessage(
+                'success',
+                'User successfuly logged in!'
+              );
+              this.submitDisabled = false;
+              this.loginService.saveUser(
+                this.loginForm.controls.login.value || '',
+                data.token,
+                data.uid
+              );
+              this.router.navigate(['/main']);
+            });
+        }
+      });
     } else {
       this.loginForm.markAllAsTouched();
     }

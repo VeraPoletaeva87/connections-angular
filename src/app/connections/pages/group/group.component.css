@@ -1,19 +1,15 @@
 .marginS {
-    margin-right: 12px;
-    margin-bottom: 12px;
-}  
+  margin-right: 12px;
+  margin-bottom: 12px;
+}
 
 .marginL {
-    margin-left: 20px;
-}  
-
-.flex {
-    display: flex;
+  margin-left: 20px;
 }
 
 .conversation-block {
-    margin-left: 50px;
-    width: 40%;
-    padding-top: 10px;
-    padding-bottom: 10px;
+  margin-left: 50px;
+  width: 40%;
+  padding-top: 10px;
+  padding-bottom: 10px;
 }

@@ -1,23 +1,23 @@
 .toast {
-    position: fixed;
-    top: 20px;
-    left: 85%;
-    transform: translateX(-50%);
-    padding: 15px;
-    color: #fff;
-    border-radius: 5px;
-    opacity: 1;
-    transition: opacity 0.3s ease-in-out;
+  position: fixed;
+  top: 20px;
+  left: 85%;
+  transform: translateX(-50%);
+  padding: 15px;
+  color: #fff;
+  border-radius: 5px;
+  opacity: 1;
+  transition: opacity 0.3s ease-in-out;
 }
 
 .show {
-    opacity: 1;
+  opacity: 1;
 }
 
 .success {
-    background-color: #498d47;
+  background-color: #498d47;
 }
 
 .error {
-    background-color: #d8401a;
+  background-color: #d8401a;
 }

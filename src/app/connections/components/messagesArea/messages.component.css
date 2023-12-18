@@ -1,65 +1,61 @@
 .align-right {
-    align-items: end;
+  align-items: end;
 }
 
 .align-left {
-    align-items: start;
+  align-items: start;
 }
 
 .message-block {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 .small-font {
-    font-size: 12px;
+  font-size: 12px;
 }
 
 .light {
-    background-color: #e9f7f7;
-    color: #0d6821;
+  background-color: #e9f7f7;
+  color: #0d6821;
 }
 
 .dark {
-    background-color: #4d515a;
+  background-color: #4d515a;
 }
 
 .beige {
-    background-color: #f1eec8;
+  background-color: #f1eec8;
 }
 
 .message-item {
-    border-radius: 20px;
-    padding-right: 12px;
-    padding-top: 4px;
-    padding-left: 12px;
-    display: flex;
-    flex-direction: column;
-    align-items: end;
-    padding-bottom: 4px;
-    margin-bottom: 12px;
-    margin-top: 12px;
+  border-radius: 20px;
+  padding-right: 12px;
+  padding-top: 4px;
+  padding-left: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: end;
+  padding-bottom: 4px;
+  margin-bottom: 12px;
+  margin-top: 12px;
 }
 
 .messages-area {
-    padding-left: 8px;
-    padding-right: 8px;
+  padding-left: 8px;
+  padding-right: 8px;
 }
 
 .column {
-    display: flex;
-    flex-direction: column;
-}
-
-.invalid {
-    color: red;
+  display: flex;
+  flex-direction: column;
 }
 
 .messages-list {
-    max-height: 400px;
-    overflow: scroll;
+  max-height: 400px;
+  overflow: scroll;
 }
 
 .messages-area-light {
-    background-color: #9dbf92;
+  background-color: #9dbf92;
 }

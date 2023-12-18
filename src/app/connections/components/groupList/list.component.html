@@ -1,25 +1,27 @@
 <div>
-    <div class="flex baseline">
-        <app-button class="marginS" (click)="updateHandler()" [disabled]="updateDisabled || isRequesting">Update groups</app-button> 
-        <app-button (click)="createHandler()">Create group</app-button>
+  <div class="flex baseline">
+    <app-button
+      class="marginS"
+      (click)="updateHandler()"
+      [disabled]="updateDisabled || isRequesting"
+      >Update groups</app-button>
+    <app-button (click)="createHandler()">Create group</app-button>
+  </div>
+  <div *ngIf="updateDisabled">You can update group list in: {{ countdown$ | async }} seconds</div>
+  <div class="list-block" [class.light-theme-list]="isLight" [class.dark-theme-list]="isDarkTheme$ | async">
+    <div class="list-item" *ngFor="let item of items" (click)="itemClickHandler($event, item)">
+      <div *ngIf="item.createdBy.S === params.uid" (click)="deleteHandler($event, item.id.S)" class="delete">
+        &times;
+      </div>
+      <div>{{ item.name.S }}</div>
     </div>
-    <div *ngIf="updateDisabled" >You can update group list in: {{countdown$ | async}} seconds</div>
-    <div class="list-block" [class.light-theme-list]="isLight" [class.dark-theme-list]="isDarkTheme$ | async">
-        <div class="list-item" *ngFor="let item of items" (click)="itemClickHandler($event, item)">
-            <div *ngIf="item.createdBy.S === params.uid" (click)="deleteHandler($event, item.id.S)" class="delete">&times;</div>
-            <div>
-                {{ item.name.S }}
-            </div>
-        </div>
-    </div>
-    <app-dialog [visible]="showDialog" 
-            (closeEmitter)="handleCloseDialog()"
-            (saveEmitter)="handleSaveGroup()">
-    </app-dialog> 
-    <app-confirmation [visible]="showConfirmation" 
-            text="Delete group?"
-            (closeEmitter)="handleCloseConfirmation()"
-            (deleteEmitter)="handleDeleteConfirmation()">
-    </app-confirmation>
-    <app-toast></app-toast>
-</div>  
+  </div>
+  <app-dialog [visible]="showDialog" (closeEmitter)="handleCloseDialog()" (saveEmitter)="handleSaveGroup()"></app-dialog>
+  <app-confirmation
+    [visible]="showConfirmation"
+    text="Delete group?"
+    (closeEmitter)="handleCloseConfirmation()"
+    (deleteEmitter)="handleDeleteConfirmation()">
+  </app-confirmation>
+  <app-toast></app-toast>
+</div>

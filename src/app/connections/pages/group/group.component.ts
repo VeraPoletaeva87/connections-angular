@@ -3,7 +3,7 @@ import { Store } from '@ngrx/store';
 import { State } from '../../../redux/state.models';
 import { LoginService } from 'src/app/auth/services/login.service';
 import { getGroupById } from 'src/app/redux/selectors/groups.selector';
-import { FormattedItem, MessageData, MessageResponse, PrivateMessages, UserParams } from 'src/app/shared/types';
+import { FormattedItem, MessageData, MessageResponse, UserParams } from 'src/app/shared/types';
 import { CountdownService } from '../../services/countdown.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { tap } from 'rxjs';
@@ -11,7 +11,7 @@ import { getMessagesById } from 'src/app/redux/selectors/messages.selectors';
 import { UtilsService } from '../../services/utils.service';
 import { HTTPClientService } from 'src/app/core/services/http.service';
 import { ToastService } from '../../../core/services/toast.service';
-import * as MessagesActions from '../../../redux/actions/messages.actions';
+import * as GroupActions from '../../../redux/actions/groups.actions';
 import { ThemeService } from '../../../core/services/theme.service';
 
 @Component({
@@ -34,11 +34,13 @@ export class GroupComponent {
   };
 
   countdown$ = this.countdownService.countdown$;
+  
   get updateDisabled() {
     return this.countdownService.isRunning;
   }
 
   isDarkTheme$ = this.themeService.isDarkTheme$;
+
   get isLight() {
     return !this.themeService.isDark;
   }
@@ -103,6 +105,9 @@ export class GroupComponent {
         this.toastService.showMessage('success', 'Successfuly delete group!');
         this.showConfirmation = false;
         this.router.navigate(['/main']);
+
+        // delete current group from store to update list on main page
+        this.store.dispatch(GroupActions.DeleteCustomgroup({ id: this.id }));
       })
       .catch((message) => {
         this.toastService.showMessage('error', message);
