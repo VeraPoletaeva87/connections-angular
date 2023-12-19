@@ -1,11 +1,11 @@
 {
-  "name": "angular-intro",
+  "name": "angular-connections",
   "version": "1.0.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
-    "deploy": "gh-pages -d dist/angular-intro",
+    "deploy": "gh-pages -d dist/",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "lint": "eslint src/**/*.ts",
@@ -21,8 +21,9 @@
     "@angular/platform-browser": "^16.2.0",
     "@angular/platform-browser-dynamic": "^16.2.0",
     "@angular/router": "^16.2.0",
+    "@ngrx/effects": "^16.3.0",
+    "@ngrx/store": "^16.3.0",
     "rxjs": "~7.8.0",
-    "tslib": "^2.3.0",
     "zone.js": "~0.13.0"
   },
   "devDependencies": {

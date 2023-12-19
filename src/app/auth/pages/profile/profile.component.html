@@ -1,0 +1,38 @@
+<div class="profile-block shadow flex spread">
+  <div>
+    <div class="user-id">PROFILE INFO</div>
+    <div class="font18">Id: {{ this.item?.uid?.S }}</div>
+    <div class="flex">
+      <div class="font18 margin-rightXS">Name:</div>
+      <ng-container *ngIf="!this.isEditing">
+        <div class="font18">{{ this.item?.name?.S }}</div>
+      </ng-container>
+      <ng-container *ngIf="this.isEditing">
+        <input class="input" type="text" (input)="inputChangeHandler($event)" />
+      </ng-container>
+    </div>
+    <div class="font18">Email: {{ this.item?.email?.S }}</div>
+    <div class="font18">Date of creation: {{ this.item?.createdAt?.S }}</div>
+    <div *ngIf="!this.isEditing" class="margin-top">
+      <app-button (click)="this.editHandler()">Edit</app-button>
+    </div>
+    <ng-container *ngIf="this.isEditing">
+      <div class="margin-top">
+        <app-button
+          [disabled]="isSaving"
+          class="margin-right"
+          (click)="this.saveHandler()"
+          >Save</app-button
+        >
+        <app-button [disabled]="isSaving" (click)="this.cancelHandler()"
+          >Cancel</app-button
+        >
+      </div>
+    </ng-container>
+  </div>
+  <app-button [disabled]="isLoggingOut" (click)="this.logoutHandler()"
+    >Log out</app-button
+  >
+  <app-button (click)="this.backHandler()">Go to main page</app-button>
+  <app-toast></app-toast>
+</div>

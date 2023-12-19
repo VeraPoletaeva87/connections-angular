@@ -1,0 +1,22 @@
+.grey {
+    color: grey;
+    font-size: 24px;
+    font-weight: bold;
+    font-family: system-ui;
+    margin-left: 14px;
+    width: 195px;
+}
+
+.margin {
+    margin-left: 135px;
+}
+
+.block {
+    position: relative;
+    left: 35%;
+    top: 100px;
+}
+
+.margin-bottom {
+    margin-bottom: 30px;
+}

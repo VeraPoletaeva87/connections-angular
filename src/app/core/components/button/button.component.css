@@ -1,0 +1,15 @@
+.button {
+    border: none;
+    height: 32px;
+    width: 84px;
+    color: #efefd3;
+    background-color: #336c4a;
+}
+
+.button:disabled {
+    background-color: #787f83;
+}
+
+.button:hover {
+    cursor: pointer;
+}

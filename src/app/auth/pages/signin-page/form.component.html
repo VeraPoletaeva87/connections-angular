@@ -1,0 +1,50 @@
+<div class="login-block">
+  <div class="bold-text">Login</div>
+  <form [formGroup]="loginForm" (ngSubmit)="loginHandler()">
+    <label class="small-text" for="login">email </label>
+    <input
+      class="input {{
+        login?.invalid && (login?.dirty || login?.touched) ? 'red-border' : ''
+      }}"
+      type="text"
+      formControlName="login"
+      (input)="inputChangeHandler()"
+      required
+      email
+    />
+    <div
+      *ngIf="login?.invalid && (login?.dirty || login?.touched)"
+      class="invalid"
+    >
+      <div *ngIf="login?.errors?.['required']">Please enter a email</div>
+      <div *ngIf="login?.errors?.['email']">The email is invalid</div>
+    </div>
+    <label class="small-text" for="password">password </label>
+    <input
+      class="input {{
+        password?.invalid && (password?.dirty || password?.touched)
+          ? 'red-border'
+          : ''
+      }}"
+      type="password"
+      name="password"
+      (input)="inputChangeHandler()"
+      required
+      formControlName="password"
+    />
+    <div
+      *ngIf="password?.invalid && (password?.dirty || password?.touched)"
+      class="invalid"
+    >
+      <div *ngIf="password?.errors?.['required']">Please enter a password</div>
+    </div>
+    <app-button class="login-button" [disabled]="submitDisabled"
+      >Login</app-button
+    >
+  </form>
+  <div class="flex">
+    <div class="margin">New to Connections?</div>
+    <A href="/signup">Sign up here</A>
+  </div>
+  <app-toast></app-toast>
+</div>

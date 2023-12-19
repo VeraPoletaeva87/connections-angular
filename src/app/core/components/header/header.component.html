@@ -1,0 +1,4 @@
+<div class="flex" [class.dark-theme]="isDarkTheme$ | async">
+    <div>Welcome to Connections App!</div>
+    <app-button class="paddingL" (click)="themeChangeHandler()">Change theme</app-button>
+</div>

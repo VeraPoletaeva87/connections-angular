@@ -1,0 +1,44 @@
+.modal-content {
+  background-color: #fefefe;
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 25%;
+}
+
+.close {
+  color: #aaaaaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.red-border {
+  border: 1px solid red;
+}
+
+.border-none {
+  border: none;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+}
+
+.margin-top {
+  margin-top: 20px;
+}
+
+.input {
+  width: 330px;
+  height: 30px;
+  background-color: rgb(187, 182, 182);
+}

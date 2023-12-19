@@ -1,0 +1,21 @@
+<div class="conversation-block" [class.light-theme-block]="isLight" [class.dark-theme]="isDarkTheme$ | async">
+  <a href="#/main">Go to main page</a>
+  <div class="flex">
+    <app-button class="marginS" (click)="deleteHandler()">Delete conversation</app-button>
+    <app-button
+      class="marginS"
+      (click)="updateHandler()"
+      [disabled]="updateDisabled"
+      >Update conversation</app-button>
+  </div>
+  <div *ngIf="updateDisabled">You can update conversation in: {{ countdown$ | async }} seconds</div>
+  <app-messages [formattedItems]="formattedItems" (sendEmitter)="handleSend($event)"></app-messages>
+  <app-confirmation
+    [visible]="showConfirmation"
+    text="Delete conversation?"
+    (closeEmitter)="handleCloseConfirmation()"
+    (deleteEmitter)="handleDeleteConfirmation()"
+  >
+  </app-confirmation>
+  <app-toast></app-toast>
+</div>

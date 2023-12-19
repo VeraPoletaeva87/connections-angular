@@ -1,0 +1,16 @@
+.marginS {
+    margin-right: 12px;
+    margin-bottom: 12px;
+}  
+
+.flex {
+    display: flex;
+}
+
+.conversation-block {
+    margin-left: 50px;
+    width: 40%;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    background-color: #e3efe6;
+}

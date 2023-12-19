@@ -1,0 +1,41 @@
+<div class="modal {{ visible ? 'visible' : 'hidden' }}">
+  <div class="modal-content">
+    <div (click)="closeHandler()" class="close">&times;</div>
+    <form
+      class="column"
+      [formGroup]="createGroupForm"
+      (ngSubmit)="submitHandler()"
+    >
+      <label class="small-text" for="login">name </label>
+      <input
+        class="input {{
+          name?.invalid && (name?.dirty || name?.touched)
+            ? 'red-border'
+            : 'border-none'
+        }}"
+        type="text"
+        formControlName="name"
+        maxlength
+        pattern
+        required
+      />
+      <div
+        *ngIf="name?.invalid && (name?.dirty || name?.touched)"
+        class="invalid"
+      >
+        <div *ngIf="name?.errors?.['required']">Please enter a name</div>
+        <div *ngIf="name?.errors?.['maxlength']">Name is too long</div>
+        <div *ngIf="name?.errors?.['pattern']">
+          Name can contain only letters, digits or spaces
+        </div>
+      </div>
+      <app-button
+        class="margin-top"
+        (click)="submitHandler()"
+        [disabled]="submitDisabled"
+        >Submit</app-button
+      >
+    </form>
+  </div>
+  <app-toast></app-toast>
+</div>
