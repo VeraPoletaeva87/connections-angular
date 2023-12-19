@@ -141,9 +141,9 @@ export class PeopleListComponent {
     )
     .then((data: ConversationResponse) => {
       this.conversationItems = data.Items;
+      this.store.dispatch(ConversationActions.AddConversations({items: data.Items}));
       if (this.conversationItems.length) {
         this.companionIDs = this.conversationItems.map((item) => item.companionID.S);
-        this.store.dispatch(ConversationActions.AddConversations({items: this.conversationItems}));
       }
     })
     .catch((message) => {
@@ -154,12 +154,15 @@ export class PeopleListComponent {
   getConversations() {
     this.conversationSubscription = this.store
       .select((state) => getConversations(state))
-      .subscribe((items: ConversationData[]) => {
+      .subscribe(({fetched, items}) => {
         if (items.length) {
           this.conversationItems = items;
           this.companionIDs = this.conversationItems.map((item) => item.companionID.S);
         } else {
-          this.requestConversations();
+          // is store and response is empty - do not fetch until update button clicked
+          if (!fetched) {
+            this.requestConversations();
+          }
         }
       });
   }

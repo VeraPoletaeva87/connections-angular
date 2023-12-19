@@ -4,7 +4,10 @@ export interface State {
       userInfo: UserData,
       groupInfo: GroupData[],
       peopleList: PeopleInfo[],
-      conversationList: ConversationData[],
+      conversationList: {
+        fetched: boolean,
+        items: ConversationData[]
+      },
       messages: PrivateMessages;
     }
   
@@ -25,6 +28,9 @@ export interface State {
     },
     groupInfo: [],
     peopleList: [],
-    conversationList: [],
+    conversationList: {
+      fetched: false,
+      items: []
+    },
     messages: {}
   };   
