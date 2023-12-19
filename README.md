@@ -13,4 +13,4 @@ Milestones were made:
  404 page - 30 points
  Bonus: Style theme - 50 points
 
- Deploy: 
+ Deploy: https://verapoletaeva87.github.io/connections-angular/
