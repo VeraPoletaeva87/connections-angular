@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "angularIntro": {
+    "angularConnections": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -60,10 +60,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "angularIntro:build:production"
+              "browserTarget": "angularConnections:build:production"
             },
             "development": {
-              "browserTarget": "angularIntro:build:development"
+              "browserTarget": "angularConnections:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -71,7 +71,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "angularIntro:build"
+            "browserTarget": "angularConnections:build"
           }
         },
         "test": {
