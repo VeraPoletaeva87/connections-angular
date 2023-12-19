@@ -3,6 +3,4 @@
   class="toast"
   [class.error]="(mode$ | async) === 'error'"
   [class.success]="(mode$ | async) === 'success'"
->
-  {{ message$ | async }}
-</div>
+>{{ message$ | async }}</div>
